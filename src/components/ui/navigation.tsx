@@ -17,7 +17,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-              <div className="text-lg font-bold style=(( color: 'rgb(125, 50, 175)' }}>aiwin solutions</div>
+              <div className="text-lg font-bold style={{ color: 'rgb(125, 50, 175)', fontSize: '1.2em' }}>aiwin solutions</div>
             </div>
 
           {/* Desktop Navigation */}
