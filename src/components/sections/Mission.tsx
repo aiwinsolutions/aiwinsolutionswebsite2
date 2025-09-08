@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, TrendingUp, Users, Handshake } from 'lucide-react';
+import { Users, Binary, Target, Handshake } from 'lucide-react';
 
 const Mission = () => {
   return (
@@ -20,7 +20,7 @@ const Mission = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           <div className="text-center group">
             <div className="w-16 h-16 bg-gradient-hero rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-button">
-              <Target className="h-8 w-8 text-white" />
+              <Users className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-3">Talent</h3>
             <p className="text-muted-foreground leading-relaxed">
@@ -30,7 +30,7 @@ const Mission = () => {
 
           <div className="text-center group">
             <div className="w-16 h-16 bg-gradient-hero rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-button">
-              <TrendingUp className="h-8 w-8 text-white" />
+              <Binary className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-3">Technology</h3>
             <p className="text-muted-foreground leading-relaxed">
@@ -50,7 +50,7 @@ const Mission = () => {
 
           <div className="text-center group">
             <div className="w-16 h-16 bg-gradient-hero rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-button">
-              <Users className="h-8 w-8 text-white" />
+              <Target className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-3">Quality</h3>
             <p className="text-muted-foreground leading-relaxed">
