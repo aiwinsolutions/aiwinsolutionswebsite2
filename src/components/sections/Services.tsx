@@ -2,16 +2,16 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { 
-  BarChart3, 
+  FileText, 
   Database, 
   Brain,
-  TrendingUp
+  BarChart3
 } from 'lucide-react';
 
 const Services = () => {
   const services = [
     {
-      icon: BarChart3,
+      icon: FileText,
       title: 'Survey Programming',
       description: 'Expert programming across all platforms with multi-country and multi-lingual capabilities',
       features: ['Advanced Logic & Piping', 'Multi-language Support', 'API/Webhook Integrations', 'Real-time Dashboard'],
@@ -32,7 +32,7 @@ const Services = () => {
       color: 'bg-gradient-hero'
     },
     {
-      icon: TrendingUp,
+      icon: BarChart3,
       title: 'Visualization',
       description: 'Compelling data storytelling through interactive dashboards and reports',
       features: ['Real-time Updates', 'Interactive Dashboards', 'Custom Reports', 'Executive Summaries'],
