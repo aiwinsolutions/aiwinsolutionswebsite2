@@ -5,19 +5,19 @@ import { Star } from 'lucide-react';
 const Testimonials = () => {
   const testimonials = [
     {
-      title: "Research Director",
-      company: "Global Insights Corp",
-      content: "Aiwin Solutions transformed our research capabilities. Their expertise in advanced analytics and seamless execution helped us deliver insights faster than ever before."
+      title: "Head of Primary Research",
+      company: "Top Research Company",
+      content: "Their focus on quick survey programming and flawless execution of our multi-country study ensured exceptional quality delivery."
     },
     {
       title: "VP of Market Research",
-      company: "Innovation Consulting",
+      company: "Leading Analyst Firm",
       content: "The team's deep understanding of complex methodologies like Conjoint and MaxDiff, combined with their global panel access, made them an invaluable partner."
     },
     {
-      title: "Head of Analytics",
-      company: "Strategic Research Partners",
-      content: "Their AI-powered data validation and round-the-clock support ensured our multi-country studies were executed flawlessly with exceptional quality."
+      title: "Research Director",
+      company: "Global Consulting Firm",
+      content: "Aiwin Solutions' ease of communication and engagement made them an invaluable partner for our primary research work. Their expertise helped us deliver insights faster than ever before."
     }
   ];
 
