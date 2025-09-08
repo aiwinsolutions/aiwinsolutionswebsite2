@@ -16,12 +16,9 @@ const Navigation = () => {
     <nav className="fixed top-0 w-full bg-background/95 backdrop-blur-sm border-b border-border z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-hero rounded-lg"></div>
-            <div>
-              <div className="text-lg font-bold text-foreground">Aiwin<br />Solutions</div>
+          <div className="flex items-center">
+              <div className="text-lg font-bold style=(( color: 'rgb(125, 50, 175)' }}>aiwin solutions</div>
             </div>
-          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-10">
