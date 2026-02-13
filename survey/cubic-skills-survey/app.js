@@ -1,13 +1,14 @@
 // ========== Configuration ==========
-// After deploying the Google Apps Script, paste the web app URL here:
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxFYqttQ2TLyI5ULT5VhZNT10GTad5viQt-BWDP41jNI093rW_HEtW8Rcn9QNT-SU15/exec'; // e.g. 'https://script.google.com/macros/s/AKfy.../exec'
+// Supabase project settings (anon key is safe to expose — RLS protects data)
+const SUPABASE_URL = 'https://izeamxdmfpvcadvskczf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6ZWFteGRtZnB2Y2FkdnNrY3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzEwNzYsImV4cCI6MjA4NjUwNzA3Nn0.JPObhs93_BtEbclKTTbjZDVWC-gyDigwcXVAgq1quD4';
 
 // ========== State ==========
 let currentPage = 1;
 const TOTAL_PAGES = 6;
 
 const surveyState = {
-  email: '',
+  employeeId: '',
   jobFamily: '',
   competencies: [],
   sme: [],
@@ -38,15 +39,15 @@ function populateJobFamilyDropdown() {
 
 // ========== Page 1 Validation ==========
 function setupPage1Validation() {
-  const email = document.getElementById('emailInput');
+  const employeeId = document.getElementById('employeeIdInput');
   const jf = document.getElementById('jobFamilyInput');
   const btn = document.getElementById('btn-next-1');
 
   const validate = () => {
-    btn.disabled = !(email.value.trim() && jf.value);
+    btn.disabled = !(employeeId.value.trim() && jf.value);
   };
 
-  email.addEventListener('input', validate);
+  employeeId.addEventListener('input', validate);
   jf.addEventListener('change', validate);
 }
 
@@ -369,7 +370,7 @@ function setupNavigation() {
       }
       btn.addEventListener('click', () => {
         if (i === 1) {
-          surveyState.email = document.getElementById('emailInput').value.trim();
+          surveyState.employeeId = document.getElementById('employeeIdInput').value.trim();
           surveyState.jobFamily = document.getElementById('jobFamilyInput').value;
         }
         // Validate mandatory skill pages before allowing navigation
@@ -519,29 +520,37 @@ async function handleSubmit() {
   collectAllSkills();
 
   const payload = {
-    timestamp: new Date().toISOString(),
-    email: surveyState.email,
-    jobFamily: surveyState.jobFamily,
+    employee_id: surveyState.employeeId,
+    job_family: surveyState.jobFamily,
     competencies: surveyState.competencies,
     sme: surveyState.sme,
     technical: surveyState.technical
   };
 
-  if (!GOOGLE_SHEETS_URL) {
-    // No Google Sheets URL configured - show data in console and succeed
+  if (!SUPABASE_URL) {
+    // No Supabase URL configured - show data in console and succeed
     console.log('Survey Response:', JSON.stringify(payload, null, 2));
     showSuccess();
     return;
   }
 
   try {
-    // Use text/plain to avoid CORS preflight with Google Apps Script
-    const response = await fetch(GOOGLE_SHEETS_URL, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
       body: JSON.stringify(payload)
     });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Server responded with ${response.status}: ${errorBody}`);
+    }
+
     showSuccess();
   } catch (error) {
     console.error('Submission error:', error);
