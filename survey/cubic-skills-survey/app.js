@@ -39,17 +39,106 @@ function populateJobFamilyDropdown() {
 }
 
 // ========== Page 1 Validation ==========
+let employeeIdLookupTimer = null;
+let lastLookedUpId = '';
+
 function setupPage1Validation() {
-  const employeeId = document.getElementById('employeeIdInput');
+  const employeeIdInput = document.getElementById('employeeIdInput');
   const jf = document.getElementById('jobFamilyInput');
   const btn = document.getElementById('btn-next-1');
+  const jfGroup = document.getElementById('jobFamilyGroup');
 
   const validate = () => {
-    btn.disabled = !(employeeId.value.trim() && jf.value);
+    btn.disabled = !(employeeIdInput.value.trim() && jf.value);
   };
 
-  employeeId.addEventListener('input', validate);
+  // When Employee ID changes, debounce a lookup after 500ms
+  employeeIdInput.addEventListener('input', () => {
+    const id = employeeIdInput.value.trim();
+
+    // Hide JF and disable Next if ID is cleared
+    if (!id) {
+      jfGroup.style.display = 'none';
+      btn.disabled = true;
+      lastLookedUpId = '';
+      return;
+    }
+
+    // Debounce: wait 500ms after typing stops
+    clearTimeout(employeeIdLookupTimer);
+    employeeIdLookupTimer = setTimeout(() => {
+      if (id && id !== lastLookedUpId) {
+        lookupEmployeeId(id);
+      }
+    }, 500);
+  });
+
+  // Also trigger lookup on blur (tab/click away)
+  employeeIdInput.addEventListener('blur', () => {
+    const id = employeeIdInput.value.trim();
+    if (id && id !== lastLookedUpId) {
+      clearTimeout(employeeIdLookupTimer);
+      lookupEmployeeId(id);
+    }
+  });
+
   jf.addEventListener('change', validate);
+}
+
+async function lookupEmployeeId(id) {
+  lastLookedUpId = id;
+  const jfGroup = document.getElementById('jobFamilyGroup');
+  const jfSelect = document.getElementById('jobFamilyInput');
+  const btn = document.getElementById('btn-next-1');
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/survey_responses?employee_id=eq.${encodeURIComponent(id)}&select=*`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.length > 0) {
+        const existing = data[0];
+        existingRowFound = true;
+
+        // If already submitted, block re-entry
+        if (existing.is_submitted) {
+          alert('You have already submitted this survey. Thank you for your participation!');
+          jfGroup.style.display = 'none';
+          btn.disabled = true;
+          return;
+        }
+
+        // Pre-fill Job Family from saved data
+        if (existing.job_family) {
+          jfSelect.value = existing.job_family;
+          surveyState.jobFamily = existing.job_family;
+        }
+
+        // Store existing data for resume later
+        window._existingDraft = existing;
+      } else {
+        existingRowFound = false;
+        window._existingDraft = null;
+        jfSelect.value = '';
+      }
+    }
+  } catch (error) {
+    console.error('Employee ID lookup error:', error);
+  }
+
+  // Show the Job Family dropdown
+  jfGroup.style.display = 'block';
+
+  // Validate
+  btn.disabled = !(document.getElementById('employeeIdInput').value.trim() && jfSelect.value);
 }
 
 // ========== Build Skill Rows ==========
@@ -374,9 +463,20 @@ function setupNavigation() {
           surveyState.employeeId = document.getElementById('employeeIdInput').value.trim();
           surveyState.jobFamily = document.getElementById('jobFamilyInput').value;
 
-          // Check for existing response and offer to resume
-          const resumed = await checkAndResume();
-          if (resumed) return; // resume handled navigation
+          // Check for existing draft and offer to resume
+          if (window._existingDraft) {
+            const existing = window._existingDraft;
+            const hasData = (existing.competencies && existing.competencies.length > 0) ||
+                            (existing.sme && existing.sme.length > 0) ||
+                            (existing.technical && existing.technical.length > 0);
+            if (hasData) {
+              const resume = confirm('We found your previous progress. Would you like to continue where you left off?');
+              if (resume) {
+                await restoreState(existing);
+                return;
+              }
+            }
+          }
         }
         // Validate mandatory skill pages before allowing navigation
         if (MANDATORY_SKILL_PAGES.includes(i)) {
@@ -586,61 +686,7 @@ async function autoSave() {
   }
 }
 
-// ========== Check for Existing Response & Resume ==========
-async function checkAndResume() {
-  if (!surveyState.employeeId || !SUPABASE_URL) return false;
-
-  try {
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/survey_responses?employee_id=eq.${encodeURIComponent(surveyState.employeeId)}&select=*`,
-      {
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      }
-    );
-
-    if (!response.ok) return false;
-    const data = await response.json();
-
-    if (data.length === 0) return false;
-
-    const existing = data[0];
-    existingRowFound = true; // row exists, future saves should use PATCH
-
-    // Pre-fill Job Family from saved data
-    if (existing.job_family) {
-      document.getElementById('jobFamilyInput').value = existing.job_family;
-      surveyState.jobFamily = existing.job_family;
-    }
-
-    // If already submitted, block re-entry
-    if (existing.is_submitted) {
-      alert('You have already submitted this survey. Thank you for your participation!');
-      return true; // prevent navigation
-    }
-
-    // If draft exists, offer to resume
-    const hasData = (existing.competencies && existing.competencies.length > 0) ||
-                    (existing.sme && existing.sme.length > 0) ||
-                    (existing.technical && existing.technical.length > 0);
-
-    if (hasData) {
-      const resume = confirm('We found your previous progress. Would you like to continue where you left off?');
-      if (resume) {
-        await restoreState(existing);
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    console.error('Resume check error:', error);
-    return false;
-  }
-}
-
+// ========== Restore State from Saved Data ==========
 async function restoreState(data) {
   isRestoringData = true;
 
