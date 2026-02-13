@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ========== State ==========
 let currentPage = 1;
 const TOTAL_PAGES = 6;
+let isRestoringData = false; // flag to prevent auto-save during restore
 
 const surveyState = {
   employeeId: '',
@@ -368,10 +369,14 @@ function setupNavigation() {
       if (MANDATORY_SKILL_PAGES.includes(i)) {
         btn.disabled = true;
       }
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         if (i === 1) {
           surveyState.employeeId = document.getElementById('employeeIdInput').value.trim();
           surveyState.jobFamily = document.getElementById('jobFamilyInput').value;
+
+          // Check for existing response and offer to resume
+          const resumed = await checkAndResume();
+          if (resumed) return; // resume handled navigation
         }
         // Validate mandatory skill pages before allowing navigation
         if (MANDATORY_SKILL_PAGES.includes(i)) {
@@ -382,6 +387,11 @@ function setupNavigation() {
           }
         }
         goToPage(i + 1);
+
+        // Auto-save progress after navigating away from skill pages
+        if (i >= 2 && i <= 5) {
+          autoSave();
+        }
       });
     }
   }
@@ -390,7 +400,13 @@ function setupNavigation() {
   for (let i = 2; i <= TOTAL_PAGES; i++) {
     const btn = document.getElementById(`btn-back-${i}`);
     if (btn) {
-      btn.addEventListener('click', () => goToPage(i - 1));
+      btn.addEventListener('click', () => {
+        goToPage(i - 1);
+        // Auto-save when going back from skill pages
+        if (i >= 3 && i <= 6) {
+          autoSave();
+        }
+      });
     }
   }
 
@@ -511,6 +527,181 @@ function buildSummary() {
   });
 }
 
+// ========== Auto-Save ==========
+async function autoSave() {
+  if (!surveyState.employeeId || !SUPABASE_URL || isRestoringData) return;
+
+  collectAllSkills();
+
+  const payload = {
+    employee_id: surveyState.employeeId,
+    job_family: surveyState.jobFamily,
+    competencies: surveyState.competencies,
+    sme: surveyState.sme,
+    technical: surveyState.technical,
+    current_page: currentPage,
+    is_submitted: false
+  };
+
+  try {
+    // Upsert: insert if new, update if employee_id already exists
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal,resolution=merge-duplicates'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      console.log('Progress auto-saved');
+    }
+  } catch (error) {
+    console.error('Auto-save error:', error);
+  }
+}
+
+// ========== Check for Existing Response & Resume ==========
+async function checkAndResume() {
+  if (!surveyState.employeeId || !SUPABASE_URL) return false;
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/survey_responses?employee_id=eq.${encodeURIComponent(surveyState.employeeId)}&select=*`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      }
+    );
+
+    if (!response.ok) return false;
+    const data = await response.json();
+
+    if (data.length === 0) return false;
+
+    const existing = data[0];
+
+    // If already submitted, block re-entry
+    if (existing.is_submitted) {
+      alert('You have already submitted this survey. Thank you for your participation!');
+      return true; // prevent navigation
+    }
+
+    // If draft exists, offer to resume
+    const hasData = (existing.competencies && existing.competencies.length > 0) ||
+                    (existing.sme && existing.sme.length > 0) ||
+                    (existing.technical && existing.technical.length > 0);
+
+    if (hasData) {
+      const resume = confirm('We found your previous progress. Would you like to continue where you left off?');
+      if (resume) {
+        await restoreState(existing);
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Resume check error:', error);
+    return false;
+  }
+}
+
+async function restoreState(data) {
+  isRestoringData = true;
+
+  // Restore job family
+  if (data.job_family) {
+    document.getElementById('jobFamilyInput').value = data.job_family;
+    surveyState.jobFamily = data.job_family;
+  }
+
+  // Restore skill grids
+  const skillTypes = [
+    { key: 'competencies', type: 'Competency' },
+    { key: 'sme', type: 'SME' },
+    { key: 'technical', type: 'Technical' }
+  ];
+
+  for (const { key, type } of skillTypes) {
+    const skills = data[key] || [];
+    for (let i = 0; i < skills.length && i < 5; i++) {
+      await restoreSkillRow(type, i, skills[i]);
+    }
+  }
+
+  // Update surveyState
+  surveyState.competencies = data.competencies || [];
+  surveyState.sme = data.sme || [];
+  surveyState.technical = data.technical || [];
+
+  isRestoringData = false;
+
+  // Navigate to saved page (or page 2 minimum, since they just passed page 1)
+  const targetPage = data.current_page && data.current_page > 1 ? data.current_page : 2;
+  goToPage(targetPage);
+
+  // Re-validate skill pages
+  Object.values(PAGE_SKILL_MAP).forEach(st => validateSkillPage(st));
+}
+
+async function restoreSkillRow(skillType, index, skillData) {
+  const isHardcoded = HARDCODED_JF_TYPES.includes(skillType);
+
+  // Step 1: Set Job Family
+  const jfSelect = document.getElementById(`${skillType}-${index}-jf`);
+  if (!isHardcoded && skillData.jobFamily) {
+    jfSelect.value = skillData.jobFamily;
+    // Trigger cascade: populate clusters
+    const jf = skillData.jobFamily;
+    if (SKILLS_DATA[skillType] && SKILLS_DATA[skillType][jf]) {
+      const clusters = Object.keys(SKILLS_DATA[skillType][jf]).sort();
+      const clusterSelect = document.getElementById(`${skillType}-${index}-cluster`);
+      populateDropdown(clusterSelect, clusters, 'Skill Cluster');
+      showGroup(`${skillType}-${index}-cluster`);
+    }
+  }
+
+  // Step 2: Set Skill Cluster
+  if (skillData.cluster) {
+    const clusterSelect = document.getElementById(`${skillType}-${index}-cluster`);
+    clusterSelect.value = skillData.cluster;
+    // Trigger cascade: populate skills
+    const jf = isHardcoded ? 'General' : skillData.jobFamily;
+    if (SKILLS_DATA[skillType] && SKILLS_DATA[skillType][jf] && SKILLS_DATA[skillType][jf][skillData.cluster]) {
+      const skills = SKILLS_DATA[skillType][jf][skillData.cluster].slice().sort();
+      const skillSelect = document.getElementById(`${skillType}-${index}-skill`);
+      populateDropdown(skillSelect, skills, 'Skill');
+      showGroup(`${skillType}-${index}-skill`);
+    }
+  }
+
+  // Step 3: Set Skill
+  if (skillData.skill) {
+    const skillSelect = document.getElementById(`${skillType}-${index}-skill`);
+    skillSelect.value = skillData.skill;
+    // Trigger cascade: populate levels
+    const levels = PROFICIENCY_LEVELS.map(l => `Level ${l.level} - ${l.summary}`);
+    const levelSelect = document.getElementById(`${skillType}-${index}-level`);
+    populateDropdown(levelSelect, levels, 'Proficiency Level');
+    showGroup(`${skillType}-${index}-level`);
+  }
+
+  // Step 4: Set Level
+  if (skillData.level) {
+    const levelSelect = document.getElementById(`${skillType}-${index}-level`);
+    levelSelect.value = skillData.level;
+  }
+
+  // Update row status
+  updateRowStatus(skillType, index);
+}
+
 // ========== Submit ==========
 async function handleSubmit() {
   const submitBtn = document.getElementById('btn-submit');
@@ -524,7 +715,9 @@ async function handleSubmit() {
     job_family: surveyState.jobFamily,
     competencies: surveyState.competencies,
     sme: surveyState.sme,
-    technical: surveyState.technical
+    technical: surveyState.technical,
+    current_page: 6,
+    is_submitted: true
   };
 
   if (!SUPABASE_URL) {
@@ -535,13 +728,14 @@ async function handleSubmit() {
   }
 
   try {
+    // Upsert: mark as submitted
     const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Prefer': 'return=minimal'
+        'Prefer': 'return=minimal,resolution=merge-duplicates'
       },
       body: JSON.stringify(payload)
     });
