@@ -609,6 +609,12 @@ async function checkAndResume() {
     const existing = data[0];
     existingRowFound = true; // row exists, future saves should use PATCH
 
+    // Pre-fill Job Family from saved data
+    if (existing.job_family) {
+      document.getElementById('jobFamilyInput').value = existing.job_family;
+      surveyState.jobFamily = existing.job_family;
+    }
+
     // If already submitted, block re-entry
     if (existing.is_submitted) {
       alert('You have already submitted this survey. Thank you for your participation!');
