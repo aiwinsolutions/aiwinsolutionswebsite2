@@ -141,6 +141,8 @@
     const SUPABASE_URL = 'https://izeamxdmfpvcadvskczf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6ZWFteGRtZnB2Y2FkdnNrY3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzEwNzYsImV4cCI6MjA4NjUwNzA3Nn0.JPObhs93_BtEbclKTTbjZDVWC-gyDigwcXVAgq1quD4';
     const ADMIN_PASSWORD = 'cubic@2026';
+    const SESSION_KEY = 'survey_admin_session';
+    const SESSION_DURATION = 60 * 60 * 1000; // 1 hour in ms
 
     let allData = [];
 
@@ -149,12 +151,33 @@
       if (e.key === 'Enter') authenticate();
     });
 
+    // Check for existing session on page load
+    (function checkSession() {
+      const session = localStorage.getItem(SESSION_KEY);
+      if (session) {
+        const expiry = parseInt(session, 10);
+        if (Date.now() < expiry) {
+          // Session still valid — go straight to admin panel
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('adminPanel').style.display = 'block';
+          loadData();
+          scheduleAutoLogout(expiry - Date.now());
+          return;
+        }
+        // Session expired — clear it
+        localStorage.removeItem(SESSION_KEY);
+      }
+    })();
+
     function authenticate() {
       const password = document.getElementById('passwordInput').value;
       if (password === ADMIN_PASSWORD) {
+        const expiry = Date.now() + SESSION_DURATION;
+        localStorage.setItem(SESSION_KEY, expiry.toString());
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadData();
+        scheduleAutoLogout(SESSION_DURATION);
       } else {
         document.getElementById('errorMsg').style.display = 'block';
         document.getElementById('passwordInput').value = '';
@@ -162,7 +185,20 @@
       }
     }
 
+    let logoutTimer = null;
+
+    function scheduleAutoLogout(ms) {
+      if (logoutTimer) clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => {
+        alert('Your session has expired. Please sign in again.');
+        logout();
+      }, ms);
+    }
+
     function logout() {
+      if (logoutTimer) clearTimeout(logoutTimer);
+      logoutTimer = null;
+      localStorage.removeItem(SESSION_KEY);
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'block';
       document.getElementById('passwordInput').value = '';
