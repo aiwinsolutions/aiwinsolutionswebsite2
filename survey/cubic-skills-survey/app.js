@@ -528,6 +528,32 @@ function buildSummary() {
 }
 
 // ========== Auto-Save ==========
+async function saveToSupabase(payload, isUpdate) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    'Prefer': 'return=minimal'
+  };
+
+  if (isUpdate) {
+    // PATCH existing row by employee_id
+    return fetch(
+      `${SUPABASE_URL}/rest/v1/survey_responses?employee_id=eq.${encodeURIComponent(payload.employee_id)}`,
+      { method: 'PATCH', headers, body: JSON.stringify(payload) }
+    );
+  } else {
+    // INSERT new row
+    return fetch(
+      `${SUPABASE_URL}/rest/v1/survey_responses`,
+      { method: 'POST', headers, body: JSON.stringify(payload) }
+    );
+  }
+}
+
+// Track whether a row already exists for this employee
+let existingRowFound = false;
+
 async function autoSave() {
   if (!surveyState.employeeId || !SUPABASE_URL || isRestoringData) return;
 
@@ -544,20 +570,16 @@ async function autoSave() {
   };
 
   try {
-    // Upsert: insert if new, update if employee_id already exists
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Prefer': 'return=minimal,resolution=merge-duplicates'
-      },
-      body: JSON.stringify(payload)
-    });
+    const response = await saveToSupabase(payload, existingRowFound);
 
     if (response.ok) {
+      existingRowFound = true; // after first successful save, always update
       console.log('Progress auto-saved');
+    } else if (response.status === 409) {
+      // Conflict = row already exists, switch to update mode
+      existingRowFound = true;
+      const retryResponse = await saveToSupabase(payload, true);
+      if (retryResponse.ok) console.log('Progress auto-saved (retry)');
     }
   } catch (error) {
     console.error('Auto-save error:', error);
@@ -585,6 +607,7 @@ async function checkAndResume() {
     if (data.length === 0) return false;
 
     const existing = data[0];
+    existingRowFound = true; // row exists, future saves should use PATCH
 
     // If already submitted, block re-entry
     if (existing.is_submitted) {
@@ -728,17 +751,14 @@ async function handleSubmit() {
   }
 
   try {
-    // Upsert: mark as submitted
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Prefer': 'return=minimal,resolution=merge-duplicates'
-      },
-      body: JSON.stringify(payload)
-    });
+    // Save as submitted (update if row exists, insert if new)
+    let response = await saveToSupabase(payload, existingRowFound);
+
+    // If insert failed with conflict, retry as update
+    if (!response.ok && response.status === 409) {
+      existingRowFound = true;
+      response = await saveToSupabase(payload, true);
+    }
 
     if (!response.ok) {
       const errorBody = await response.text();
