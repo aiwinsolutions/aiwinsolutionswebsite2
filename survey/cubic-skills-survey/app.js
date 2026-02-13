@@ -7,6 +7,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let currentPage = 1;
 const TOTAL_PAGES = 6;
 let isRestoringData = false; // flag to prevent auto-save during restore
+let existingRowFound = false; // track whether a row already exists for this employee
 
 const surveyState = {
   employeeId: '',
@@ -650,9 +651,6 @@ async function saveToSupabase(payload, isUpdate) {
     );
   }
 }
-
-// Track whether a row already exists for this employee
-let existingRowFound = false;
 
 async function autoSave() {
   if (!surveyState.employeeId || !SUPABASE_URL || isRestoringData) return;
