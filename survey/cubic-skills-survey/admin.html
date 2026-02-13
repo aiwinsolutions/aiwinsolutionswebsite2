@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survey Admin - Download Data</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 0.9rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #7c18ae;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-primary {
+      background: #7c18ae;
+      color: #fff;
+      width: 100%;
+    }
+    .btn-primary:hover { background: #6a1496; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-download {
+      background: #16a34a;
+      color: #fff;
+      margin: 8px;
+    }
+    .btn-download:hover { background: #15803d; }
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: none;
+    }
+    .admin-panel {
+      display: none;
+    }
+    .admin-panel h2 {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    .record-count {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    .download-buttons {
+      margin-bottom: 20px;
+    }
+    .data-preview {
+      text-align: left;
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+    .data-preview h3 {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      display: block;
+    }
+    .preview-table th, .preview-table td {
+      padding: 6px 10px;
+      border: 1px solid #e5e5e5;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .preview-table th {
+      background: #f8f8f8;
+      font-weight: 600;
+      color: #555;
+    }
+    .lock-icon { font-size: 2rem; margin-bottom: 16px; }
+    .logout-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: #7c18ae;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .logout-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen">
+      <div class="lock-icon">&#128274;</div>
+      <h1>Survey Admin</h1>
+      <p class="subtitle">Enter the admin password to access survey data</p>
+      <div class="form-group">
+        <label for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter password" autofocus>
+      </div>
+      <button class="btn btn-primary" id="loginBtn" onclick="authenticate()">Sign In</button>
+      <div class="error-msg" id="errorMsg">Incorrect password. Please try again.</div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+      <h2>Survey Responses</h2>
+      <div class="record-count" id="recordCount">Loading...</div>
+      <div class="download-buttons">
+        <button class="btn btn-download" onclick="downloadCSV()">&#128196; Download CSV</button>
+        <button class="btn btn-download" onclick="downloadJSON()">&#128196; Download JSON</button>
+      </div>
+      <div class="data-preview" id="dataPreview">
+        <h3>Recent Submissions</h3>
+        <div id="previewContent">Loading...</div>
+      </div>
+      <a href="#" class="logout-link" onclick="logout(); return false;">Sign Out</a>
+    </div>
+  </div>
+
+  <script>
+    // ========== Configuration ==========
+    const SUPABASE_URL = 'https://izeamxdmfpvcadvskczf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6ZWFteGRtZnB2Y2FkdnNrY3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzEwNzYsImV4cCI6MjA4NjUwNzA3Nn0.JPObhs93_BtEbclKTTbjZDVWC-gyDigwcXVAgq1quD4';
+    const ADMIN_PASSWORD = 'cubic@2026';
+
+    let allData = [];
+
+    // Allow Enter key to submit
+    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') authenticate();
+    });
+
+    function authenticate() {
+      const password = document.getElementById('passwordInput').value;
+      if (password === ADMIN_PASSWORD) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadData();
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    }
+
+    function logout() {
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('errorMsg').style.display = 'none';
+      allData = [];
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses?select=*&order=created_at.desc`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        allData = await response.json();
+
+        document.getElementById('recordCount').textContent = `${allData.length} response${allData.length !== 1 ? 's' : ''} recorded`;
+        renderPreview();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('recordCount').textContent = 'Error loading data';
+        document.getElementById('previewContent').textContent = error.message;
+      }
+    }
+
+    function renderPreview() {
+      const container = document.getElementById('previewContent');
+      if (allData.length === 0) {
+        container.textContent = 'No responses yet.';
+        return;
+      }
+
+      // Show last 5 submissions as a simple table
+      const recent = allData.slice(0, 5);
+      let html = '<table class="preview-table"><thead><tr>';
+      html += '<th>#</th><th>Date</th><th>Employee ID</th><th>Job Family</th><th>Comp.</th><th>SME</th><th>Tech.</th>';
+      html += '</tr></thead><tbody>';
+
+      recent.forEach((row, idx) => {
+        const date = new Date(row.created_at).toLocaleDateString();
+        const compCount = (row.competencies || []).length;
+        const smeCount = (row.sme || []).length;
+        const techCount = (row.technical || []).length;
+        html += `<tr>
+          <td>${idx + 1}</td>
+          <td>${date}</td>
+          <td>${row.employee_id || ''}</td>
+          <td>${row.job_family || ''}</td>
+          <td>${compCount} skills</td>
+          <td>${smeCount} skills</td>
+          <td>${techCount} skills</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      if (allData.length > 5) {
+        html += `<p style="color:#888; font-size:0.8rem; margin-top:8px;">Showing 5 of ${allData.length} responses. Download for full data.</p>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // ========== CSV Export ==========
+    function flattenRow(row) {
+      const flat = {
+        id: row.id,
+        created_at: row.created_at,
+        employee_id: row.employee_id,
+        job_family: row.job_family
+      };
+
+      // Flatten each skill type (up to 5 per type)
+      const types = [
+        { key: 'competencies', prefix: 'Comp' },
+        { key: 'sme', prefix: 'SME' },
+        { key: 'technical', prefix: 'Tech' }
+      ];
+
+      types.forEach(({ key, prefix }) => {
+        const skills = row[key] || [];
+        for (let i = 0; i < 5; i++) {
+          if (i < skills.length) {
+            flat[`${prefix}${i+1}_JobFamily`] = skills[i].jobFamily || '';
+            flat[`${prefix}${i+1}_Cluster`] = skills[i].cluster || '';
+            flat[`${prefix}${i+1}_Skill`] = skills[i].skill || '';
+            flat[`${prefix}${i+1}_Level`] = skills[i].level || '';
+          } else {
+            flat[`${prefix}${i+1}_JobFamily`] = '';
+            flat[`${prefix}${i+1}_Cluster`] = '';
+            flat[`${prefix}${i+1}_Skill`] = '';
+            flat[`${prefix}${i+1}_Level`] = '';
+          }
+        }
+      });
+
+      return flat;
+    }
+
+    function downloadCSV() {
+      if (allData.length === 0) {
+        alert('No data to download.');
+        return;
+      }
+
+      const flatRows = allData.map(flattenRow);
+      const headers = Object.keys(flatRows[0]);
+
+      // Build CSV string
+      let csv = headers.map(h => `"${h}"`).join(',') + '\n';
+      flatRows.forEach(row => {
+        csv += headers.map(h => {
+          const val = (row[h] ?? '').toString().replace(/"/g, '""');
+          return `"${val}"`;
+        }).join(',') + '\n';
+      });
+
+      // Download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `survey_responses_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadJSON() {
+      if (allData.length === 0) {
+        alert('No data to download.');
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `survey_responses_${new Date().toISOString().slice(0,10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
