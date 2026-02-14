@@ -160,8 +160,13 @@ h3 {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.form-input-cell .validation-message {
-  margin-top: 4px;
+.form-error-cell {
+  vertical-align: middle;
+  padding-left: 12px;
+}
+
+.form-error-cell .validation-message {
+  white-space: nowrap;
 }
 
 /* ========== Page 2: Instructions ========== */
