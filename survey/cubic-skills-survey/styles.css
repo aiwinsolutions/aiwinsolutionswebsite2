@@ -163,10 +163,12 @@ h3 {
 .form-error-cell {
   vertical-align: middle;
   padding-left: 12px;
+  max-width: 350px;
 }
 
 .form-error-cell .validation-message {
-  white-space: nowrap;
+  font-size: 14px;
+  white-space: normal;
 }
 
 /* ========== Page 2: Instructions ========== */
