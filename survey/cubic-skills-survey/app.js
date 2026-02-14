@@ -132,9 +132,12 @@ async function lookupEmployeeId(id) {
         const existing = data[0];
         existingRowFound = true;
 
-        // If already submitted, block re-entry
+        // If already submitted, block re-entry with inline message
         if (existing.is_submitted) {
-          alert('You have already submitted this survey. Thank you for your participation!');
+          if (errMsg) {
+            errMsg.textContent = 'You have already submitted this survey. Thank you for your participation!';
+            errMsg.style.display = 'block';
+          }
           jfGroup.style.display = 'none';
           btn.disabled = true;
           return;

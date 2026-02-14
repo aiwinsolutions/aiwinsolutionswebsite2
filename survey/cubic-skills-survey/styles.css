@@ -167,6 +167,8 @@ h3 {
 
 .form-error-cell .validation-message {
   white-space: nowrap;
+  font-size: 15px;
+  padding: 8px 16px;
 }
 
 /* ========== Page 2: Instructions ========== */
