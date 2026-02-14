@@ -67,7 +67,7 @@ body {
   display: none;
   background: #fff;
   border-radius: 12px;
-  padding: 24px 40px 28px;
+  padding: 18px 40px 24px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   animation: fadeIn 0.3s ease;
 }
@@ -82,57 +82,62 @@ body {
 }
 
 h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   border-bottom: 3px solid #2563eb;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 17px;
   color: #334155;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 h3 {
   font-size: 16px;
   color: #334155;
-  margin-bottom: 8px;
-  margin-top: 20px;
+  margin-bottom: 6px;
+  margin-top: 12px;
 }
 
 /* ========== Page 1: Intro ========== */
 .survey-purpose {
   background: #f8fafc;
   border-left: 4px solid #2563eb;
-  padding: 14px 24px;
+  padding: 10px 20px;
   border-radius: 0 8px 8px 0;
-  margin: 12px 0 20px;
+  margin: 6px 0 14px;
 }
 
 .survey-purpose p {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
 }
 
 .form-group label {
-  display: block;
   font-weight: 600;
-  margin-bottom: 6px;
   color: #334155;
   font-size: 14px;
+  white-space: nowrap;
+  min-width: 100px;
 }
 
 .form-group input,
 .form-group select {
-  width: 100%;
-  max-width: 420px;
-  padding: 10px 14px;
+  flex: 1;
+  max-width: 360px;
+  padding: 8px 14px;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
@@ -150,7 +155,7 @@ h3 {
 
 /* ========== Page 2: Instructions ========== */
 .instructions-content {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .skill-types-info {
@@ -287,7 +292,7 @@ h3 {
 /* ========== Pages 3-5: Skill Selection ========== */
 .page-description {
   color: #475569;
-  margin: 8px 0 16px;
+  margin: 4px 0 10px;
   font-size: 14px;
 }
 
@@ -434,15 +439,15 @@ h3 {
 
 /* ========== Skills Structure Reference (below grids) ========== */
 .skills-reference {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid #e2e8f0;
 }
 
 .skills-reference h2 {
-  font-size: 18px;
+  font-size: 16px;
   color: #334155;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
 .skills-reference p {
@@ -454,9 +459,9 @@ h3 {
 
 /* Bullet list for skill types */
 .skill-types-list {
-  margin: 10px 0 16px 20px;
+  margin: 6px 0 10px 20px;
   font-size: 14px;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 .skill-types-list li {
@@ -465,7 +470,7 @@ h3 {
 
 /* Structure diagram image */
 .structure-diagram {
-  margin: 16px 0;
+  margin: 10px 0;
   text-align: center;
 }
 
@@ -477,7 +482,7 @@ h3 {
 
 /* ========== Page 6: Closing ========== */
 .closing-content {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .summary-section {
@@ -590,13 +595,21 @@ h3 {
   margin-right: 12px;
 }
 
+/* Employee ID error appears below the inline form-group */
+.form-group .validation-message {
+  position: absolute;
+  top: 100%;
+  left: 114px;
+  margin-top: 4px;
+}
+
 /* ========== Navigation Buttons ========== */
 .nav-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 28px;
-  padding-top: 20px;
+  margin-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid #e2e8f0;
 }
 
