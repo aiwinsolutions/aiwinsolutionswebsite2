@@ -104,7 +104,7 @@ async function lookupEmployeeId(id) {
   const errMsg = document.getElementById('employee-id-error');
   if (typeof VALID_EMPLOYEE_IDS !== 'undefined' && !VALID_EMPLOYEE_IDS.has(id)) {
     if (errMsg) {
-      errMsg.textContent = 'Invalid Employee ID. Please enter a valid employee ID.';
+      errMsg.textContent = 'Please enter a valid employee ID.';
       errMsg.style.display = 'block';
     }
     jfGroup.style.display = 'none';
