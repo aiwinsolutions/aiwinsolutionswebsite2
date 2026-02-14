@@ -29,16 +29,23 @@
         <p>We're building a solution to better understand the skills and experiences of our personnel to better understand the capabilities we're bringing to market. This survey helps us understand the full range of capabilities across our team and your responses will not be used for performance evaluation.</p>
         <p>To start, please confirm your employee ID and primary job family within Cubic.</p>
       </div>
-      <div class="form-group">
-        <label for="employeeIdInput">Employee ID</label>
-        <input type="text" id="employeeIdInput" placeholder="Enter your employee ID" required>
-      </div>
-      <div class="form-group" id="jobFamilyGroup" style="display:none;">
-        <label for="jobFamilyInput">Job Family</label>
-        <select id="jobFamilyInput">
-          <option value="">-- Select Job Family --</option>
-        </select>
-      </div>
+      <table class="form-table">
+        <tr>
+          <td class="form-label-cell"><label for="employeeIdInput">Employee ID</label></td>
+          <td class="form-input-cell">
+            <input type="text" id="employeeIdInput" placeholder="Enter your employee ID" required>
+            <div class="validation-message" id="employee-id-error" style="display:none;"></div>
+          </td>
+        </tr>
+        <tr id="jobFamilyGroup" style="display:none;">
+          <td class="form-label-cell"><label for="jobFamilyInput">Job Family</label></td>
+          <td class="form-input-cell">
+            <select id="jobFamilyInput">
+              <option value="">-- Select Job Family --</option>
+            </select>
+          </td>
+        </tr>
+      </table>
       <div class="nav-buttons">
         <div></div>
         <button class="btn btn-next" id="btn-next-1" disabled>Next</button>

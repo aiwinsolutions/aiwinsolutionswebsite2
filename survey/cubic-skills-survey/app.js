@@ -101,25 +101,18 @@ async function lookupEmployeeId(id) {
   const btn = document.getElementById('btn-next-1');
 
   // Validate against whitelist
+  const errMsg = document.getElementById('employee-id-error');
   if (typeof VALID_EMPLOYEE_IDS !== 'undefined' && !VALID_EMPLOYEE_IDS.has(id)) {
-    // Show inline error message
-    let errMsg = document.getElementById('employee-id-error');
-    if (!errMsg) {
-      errMsg = document.createElement('div');
-      errMsg.id = 'employee-id-error';
-      errMsg.className = 'validation-message';
-      const input = document.getElementById('employeeIdInput');
-      input.parentElement.appendChild(errMsg);
+    if (errMsg) {
+      errMsg.textContent = 'Invalid Employee ID. Please enter a valid employee ID.';
+      errMsg.style.display = 'block';
     }
-    errMsg.textContent = 'Invalid Employee ID. Please enter a valid employee ID.';
-    errMsg.style.display = 'block';
     jfGroup.style.display = 'none';
     btn.disabled = true;
     return;
   }
 
   // Clear any previous error
-  const errMsg = document.getElementById('employee-id-error');
   if (errMsg) errMsg.style.display = 'none';
 
   try {
@@ -165,8 +158,8 @@ async function lookupEmployeeId(id) {
     console.error('Employee ID lookup error:', error);
   }
 
-  // Show the Job Family dropdown
-  jfGroup.style.display = 'block';
+  // Show the Job Family dropdown (table-row for <tr> element)
+  jfGroup.style.display = 'table-row';
 
   // Validate
   btn.disabled = !(document.getElementById('employeeIdInput').value.trim() && jfSelect.value);

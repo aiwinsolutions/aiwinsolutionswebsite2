@@ -117,27 +117,33 @@ h3 {
   font-size: 14px;
 }
 
-.form-group {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  position: relative;
+/* Form table for aligned label + input rows */
+.form-table {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  margin-bottom: 8px;
 }
 
-.form-group label {
+.form-label-cell {
+  width: 110px;
+  padding-right: 14px;
+  vertical-align: middle;
+}
+
+.form-label-cell label {
   font-weight: 600;
   color: #334155;
   font-size: 14px;
   white-space: nowrap;
-  width: 100px;
-  flex-shrink: 0;
 }
 
-.form-group input,
-.form-group select {
+.form-input-cell {
+  vertical-align: middle;
+}
+
+.form-input-cell input,
+.form-input-cell select {
   width: 340px;
-  flex-shrink: 0;
   padding: 8px 14px;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
@@ -147,11 +153,15 @@ h3 {
   background: #fff;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-input-cell input:focus,
+.form-input-cell select:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-input-cell .validation-message {
+  margin-top: 4px;
 }
 
 /* ========== Page 2: Instructions ========== */
@@ -596,13 +606,6 @@ h3 {
   margin-right: 12px;
 }
 
-/* Employee ID error appears below the inline form-group */
-.form-group .validation-message {
-  position: absolute;
-  top: 100%;
-  left: 114px;
-  margin-top: 4px;
-}
 
 /* ========== Navigation Buttons ========== */
 .nav-buttons {
