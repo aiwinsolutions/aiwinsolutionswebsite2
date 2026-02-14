@@ -92,6 +92,28 @@ async function lookupEmployeeId(id) {
   const jfSelect = document.getElementById('jobFamilyInput');
   const btn = document.getElementById('btn-next-1');
 
+  // Validate against whitelist
+  if (typeof VALID_EMPLOYEE_IDS !== 'undefined' && !VALID_EMPLOYEE_IDS.has(id)) {
+    // Show inline error message
+    let errMsg = document.getElementById('employee-id-error');
+    if (!errMsg) {
+      errMsg = document.createElement('div');
+      errMsg.id = 'employee-id-error';
+      errMsg.className = 'validation-message';
+      const input = document.getElementById('employeeIdInput');
+      input.parentElement.appendChild(errMsg);
+    }
+    errMsg.textContent = 'Invalid Employee ID. Please enter a valid employee ID.';
+    errMsg.style.display = 'block';
+    jfGroup.style.display = 'none';
+    btn.disabled = true;
+    return;
+  }
+
+  // Clear any previous error
+  const errMsg = document.getElementById('employee-id-error');
+  if (errMsg) errMsg.style.display = 'none';
+
   try {
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/survey_responses?employee_id=eq.${encodeURIComponent(id)}&select=*`,
@@ -393,30 +415,31 @@ const PAGE_SKILL_MAP = {
 const MANDATORY_SKILL_PAGES = [3];
 
 function isSkillPageComplete(skillType) {
+  let completed = 0;
   for (let i = 0; i < 5; i++) {
     const jf = document.getElementById(`${skillType}-${i}-jf`)?.value || '';
     const cluster = document.getElementById(`${skillType}-${i}-cluster`)?.value || '';
     const skill = document.getElementById(`${skillType}-${i}-skill`)?.value || '';
     const level = document.getElementById(`${skillType}-${i}-level`)?.value || '';
-    if (!jf || !cluster || !skill || !level) {
-      return false;
+    if (jf && cluster && skill && level) {
+      completed++;
     }
   }
-  return true;
+  return completed >= 3;
 }
 
-function getIncompleteRowCount(skillType) {
-  let incomplete = 0;
+function getCompletedRowCount(skillType) {
+  let completed = 0;
   for (let i = 0; i < 5; i++) {
     const jf = document.getElementById(`${skillType}-${i}-jf`)?.value || '';
     const cluster = document.getElementById(`${skillType}-${i}-cluster`)?.value || '';
     const skill = document.getElementById(`${skillType}-${i}-skill`)?.value || '';
     const level = document.getElementById(`${skillType}-${i}-level`)?.value || '';
-    if (!jf || !cluster || !skill || !level) {
-      incomplete++;
+    if (jf && cluster && skill && level) {
+      completed++;
     }
   }
-  return incomplete;
+  return completed;
 }
 
 function validateSkillPage(skillType) {
@@ -435,14 +458,15 @@ function validateSkillPage(skillType) {
   const msgId = `validation-msg-${pageNum}`;
   let msg = document.getElementById(msgId);
   if (isMandatory && !complete) {
-    const remaining = getIncompleteRowCount(skillType);
+    const completed = getCompletedRowCount(skillType);
+    const moreNeeded = 3 - completed;
     if (!msg) {
       msg = document.createElement('div');
       msg.id = msgId;
       msg.className = 'validation-message';
       btn.parentElement.insertBefore(msg, btn);
     }
-    msg.textContent = `Please complete all 5 rows (${remaining} remaining)`;
+    msg.textContent = `Please complete at least 3 rows (${moreNeeded} more needed)`;
     msg.style.display = 'block';
   } else if (msg) {
     msg.style.display = 'none';

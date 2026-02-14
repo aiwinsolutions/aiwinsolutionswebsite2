@@ -1,645 +1,423 @@
 const SKILLS_DATA = {
   "Competency": {
-    "System Engineering": {
-      "Core Systems Engineering Foundations": [
-        "Core Systems Engineering",
-        "Systems Context",
-        "Principal and Relevant Systems",
-        "Relevant Domains & Technologies",
-        "System of Systems Engineering",
-        "Systems Thinking",
-        "General Engineering",
-        "Critical Thinking",
-        "Systems Modeling & Analysis"
-      ],
-      "Lifecycle & Capability Engineering": [
-        "System’s Concept of Operations",
-        "Lifecycles",
-        "Capability Engineering",
-        "Design For… (DFx)",
-        "Transition",
-        "Utilization & Support",
-        "Retirement"
-      ],
-      "Requirements, Architecture & Design": [
-        "Requirements Definition",
-        "Technical Requirements Definition & Analysis",
-        "Systems Architecting",
-        "Logical Decomposition",
-        "Interfaces",
-        "Systems Modeling & Analysis (Design & Architecture)"
-      ],
-      "Integration, Verification & Validation": [
-        "Integration",
-        "Verification",
-        "Validation",
-        "Product Verification and Validation"
-      ],
-      "Specialty Engineering Disciplines": [
-        "Lifecycle Cost Analysis",
-        "Electromagnetic Compatibility",
-        "Environmental Engineering / Impact Analysis",
-        "Logistics Engineering",
-        "Manufacturing and Producibility Analysis",
-        "Reliability, Availability & Maintainability",
-        "Resilience Engineering",
-        "System Safety Engineering",
-        "System Security Engineering",
-        "Cybersecurity",
-        "Training Needs Analysis",
-        "Usability / Human Systems Integration",
-        "Value Engineering"
-      ],
-      "SE Management & Governance": [
-        "Planning",
-        "Monitoring & Control",
-        "Risk & Opportunity Management",
-        "Decision Management",
-        "Concurrent Engineering",
-        "Business & Enterprise Integration",
-        "Acquisition & Supply",
-        "Information Management",
-        "Configuration Management"
-      ],
-      "Project Controls & Delivery": [
-        "Project Assessment & Control",
-        "Schedule Management",
-        "Resource Management",
-        "Earned Value Management",
-        "Leading Indicators",
-        "Lagging Indicators"
-      ],
-      "Technical Leadership & Collaboration": [
-        "Technical Leadership",
-        "Negotiation",
-        "Team Dynamics",
-        "Facilitation",
-        "Emotional Intelligence",
-        "Coaching & Mentoring",
-        "Communications"
-      ],
-      "Professional & Ethical Practice": [
-        "Ethics & Professionalism"
-      ],
-      "Chief Systems Engineer – Technical": [
-        "Technical Planning",
-        "Technical Requirements Definition & Analysis",
-        "Logical Decomposition",
-        "Product Verification and Validation",
-        "Product Transition",
-        "Lifecycle Management",
-        "Technical Risk Management",
-        "Systems Thinking (CSE)",
-        "System Complexity",
-        "Big Picture Thinking",
-        "Abstraction",
-        "Paradoxical Mindset"
-      ],
-      "Chief Systems Engineer – Enabling": [
-        "Developing People",
-        "Leading People",
-        "Thinking Critically",
-        "Building Trust",
-        "Communicating Effectively",
-        "Establishing & Maintaining Stakeholder Relationships",
-        "Influencing Others",
-        "Developing Strategy and Vision",
-        "Fostering Agility",
-        "Promoting Innovation",
-        "Building Government Acumen",
-        "Possessing a Macro Perspective"
-      ],
-      "Product & Platform Knowledge – Back Office": [
-        "Account Based (ABP, Fare Manager)",
-        "B2B",
-        "Payment Processing",
-        "Customer Services",
-        "Operational Reporting",
-        "Device Monitoring & Management",
-        "Data Management & Analytics",
-        "Financial Accounting & Reporting",
-        "Fraud & Risk Management",
-        "Open APIs",
-        "Token Lifecycle Management",
-        "Virtual Point of Sale",
-        "Fares Engine"
-      ],
-      "Supporting Systems & Infrastructure": [
-        "System Utilities",
-        "On Board Infrastructure",
-        "Platform Infrastructure",
-        "Central Infrastructure"
-      ],
-      "Product Knowledge – Channels & Mobile": [
-        "Customer Website",
-        "Retail Website",
-        "IVR",
-        "Mobile Inspection",
-        "Mobile Retail",
-        "Mobile Traveler",
-        "Mobile Wallets"
-      ],
-      "Product Knowledge – Devices & Components": [
-        "Driver Console Units (DCU3/DCU4)",
-        "HSM / Key Encryption",
-        "Gates & Fare Gates",
-        "Validators",
-        "Inspection Devices",
-        "Retail Devices",
-        "POS",
-        "TVMs",
-        "Fareboxes",
-        "Readers (TR1–TR4)"
-      ],
-      "Program & Market Experience": [
-        "AFC End-to-End Program Experience",
-        "Named City / Authority Deployments",
-        "ITS Programs",
-        "Legacy Solutions"
-      ],
-      "Methodologies & Ways of Working": [
-        "MBSE",
-        "SAFe",
-        "Agile Systems Engineering",
-        "Lean Systems Engineering"
-      ],
-      "Certifications & Credentials": [
-        "INCOSE – CAB",
-        "INCOSE – ASEP",
-        "INCOSE – CSEP",
-        "INCOSE – ESEP"
-      ]
-    },
-    "Software Engineering": {
-      "Core Software Engineering Foundations": [
-        "Software Engineering Principles",
-        "Problem Decomposition",
-        "Algorithmic Thinking",
-        "Data Structures",
-        "Complexity Analysis",
-        "Programming Paradigms (OOP, FP, Procedural)",
-        "Software Design Principles (SOLID, DRY, KISS)",
-        "Code Quality & Maintainability",
-        "Debugging & Troubleshooting"
-      ],
-      "Requirements & Software Design": [
-        "Requirements Analysis",
-        "User Stories & Use Cases",
-        "Functional Design",
-        "Non-Functional Requirements",
-        "API Design",
-        "Data Modeling",
-        "Software Architecture",
-        "Design Patterns",
-        "Trade-off Analysis"
-      ],
-      "Software Architecture & System Design": [
-        "Monolithic Architecture",
-        "Layered Architecture",
-        "Microservices Architecture",
-        "Event-Driven Architecture",
-        "Distributed Systems Design",
-        "Scalability Design",
-        "Fault Tolerance",
-        "Performance Engineering",
-        "Interoperability & Integration"
-      ],
-      "Programming & Implementation": [
-        "Backend Development",
-        "Frontend Development",
-        "Full-Stack Development",
-        "API Implementation",
-        "Database Development",
-        "Asynchronous Programming",
-        "Secure Coding Practices",
-        "Refactoring",
-        "Code Optimization"
-      ],
-      "Testing, Quality & Assurance": [
-        "Unit Testing",
-        "Integration Testing",
-        "System Testing",
-        "Regression Testing",
-        "Test Automation",
-        "Performance Testing",
-        "Security Testing",
-        "Test Strategy & Planning",
-        "Defect Management"
-      ],
-      "DevOps, CI/CD & Operations": [
-        "Continuous Integration",
-        "Continuous Deployment",
-        "Build & Release Management",
-        "Infrastructure as Code",
-        "Environment Management",
-        "Monitoring & Logging",
-        "Incident Management",
-        "Reliability Engineering",
-        "Operational Support"
-      ],
-      "Cloud, Platforms & Infrastructure": [
-        "Cloud Computing Fundamentals",
-        "Containerization",
-        "Orchestration (e.g., Kubernetes concepts)",
-        "Platform Architecture",
-        "Identity & Access Management",
-        "Networking Fundamentals",
-        "Storage & Databases",
-        "Cost Optimization",
-        "Platform Security"
-      ],
-      "Data, Integration & APIs": [
-        "API Management",
-        "Data Integration",
-        "Event Streaming",
-        "Messaging Systems",
-        "Data Persistence",
-        "Data Quality",
-        "Data Privacy",
-        "Schema Management"
-      ],
-      "Security, Privacy & Compliance": [
-        "Application Security",
-        "Authentication & Authorization",
-        "Secure Design",
-        "Vulnerability Management",
-        "Threat Modeling",
-        "Privacy by Design",
-        "Compliance Awareness",
-        "Secure Operations"
-      ],
-      "Software Lifecycle & Delivery": [
-        "Agile Software Development",
-        "Scrum / Kanban Practices",
-        "Iterative & Incremental Delivery",
-        "Backlog Management",
-        "Estimation & Planning",
-        "Release Planning",
-        "Change Management",
-        "Technical Debt Management"
-      ],
-      "Technical Leadership & Collaboration": [
-        "Technical Leadership",
-        "Code Reviews",
-        "Mentoring & Coaching",
-        "Cross-functional Collaboration",
-        "Stakeholder Communication",
-        "Technical Decision Making",
-        "Conflict Resolution",
-        "Knowledge Sharing"
-      ],
-      "Professional Software Engineering Practice": [
-        "Engineering Ethics",
-        "Documentation & Knowledge Management",
-        "Open-Source Awareness",
-        "Regulatory Awareness",
-        "Continuous Learning",
-        "Time & Priority Management"
-      ]
-    },
-    "V&V Testing": {
-      "Core V&V Foundations": [
-        "Verification & Validation Principles",
-        "Difference Between Verification and Validation",
-        "Test Engineering Fundamentals",
-        "Quality Assurance vs Quality Control",
-        "Test Process Models",
-        "Risk-Based Testing",
-        "Test Metrics & KPIs",
-        "Defect Lifecycle Management"
-      ],
-      "Requirements & Test Design": [
-        "Requirements Analysis for Testability",
-        "Test Case Design",
-        "Test Scenarios & Use Cases",
-        "Boundary & Equivalence Analysis",
-        "Negative & Edge Case Testing",
-        "Traceability (Requirements ↔ Tests)",
-        "Coverage Analysis",
-        "Test Data Design"
-      ],
-      "Test Planning & Management": [
-        "Test Strategy Definition",
-        "Test Planning",
-        "Test Estimation",
-        "Test Scheduling",
-        "Test Environment Planning",
-        "Entry & Exit Criteria",
-        "Test Readiness Reviews",
-        "Test Reporting"
-      ],
-      "Functional & System Testing": [
-        "Functional Testing",
-        "System Testing",
-        "End-to-End Testing",
-        "Integration Testing",
-        "Regression Testing",
-        "Exploratory Testing",
-        "User Acceptance Support",
-        "Operational Scenario Testing"
-      ],
-      "Non-Functional Testing": [
-        "Performance Testing",
-        "Load Testing",
-        "Stress Testing",
-        "Reliability Testing",
-        "Availability Testing",
-        "Scalability Testing",
-        "Security Testing",
-        "Resilience & Failover Testing",
-        "Usability Testing",
-        "Accessibility Testing"
-      ],
-      "Automation & Tooling": [
-        "Test Automation Strategy",
-        "Automated Test Design",
-        "UI Test Automation",
-        "API Test Automation",
-        "Integration Test Automation",
-        "Test Framework Development",
-        "Continuous Testing",
-        "Test Data Automation"
-      ],
-      "Integration, Interfaces & Data Validation": [
-        "Interface Testing",
-        "Data Validation",
-        "Message Validation",
-        "API Contract Testing",
-        "Batch & File-Based Testing",
-        "Event & Streaming Validation",
-        "Third-Party Integration Testing"
-      ],
-      "Hardware, Embedded & Field Testing": [
-        "Hardware Verification",
-        "Firmware Testing",
-        "Device Integration Testing",
-        "Environmental Testing",
-        "Electromagnetic Compatibility Testing",
-        "Field & On-Site Testing",
-        "Installation & Commissioning Testing"
-      ],
-      "Test Environments & Test Data": [
-        "Environment Configuration",
-        "Test Environment Management",
-        "Test Data Management",
-        "Synthetic Data Generation",
-        "Data Privacy in Testing",
-        "Environment Parity & Drift Management"
-      ],
-      "Defect, Quality & Assurance Management": [
-        "Defect Triage",
-        "Root Cause Analysis",
-        "Quality Gates",
-        "Release Readiness Assessment",
-        "Continuous Improvement",
-        "Audit & Compliance Support"
-      ],
-      "Compliance, Safety & Regulatory Testing": [
-        "Compliance Testing",
-        "Safety-Critical Testing",
-        "Security Compliance Testing",
-        "Payment & Financial Compliance Testing",
-        "Standards-Based Testing",
-        "Evidence & Audit Artifacts"
-      ],
-      "DevOps & Continuous Testing": [
-        "CI/CD Pipeline Integration",
-        "Shift-Left Testing",
-        "Shift-Right Testing",
-        "Test Environment Provisioning",
-        "Monitoring & Observability Validation",
-        "Production Validation & Smoke Testing"
-      ],
-      "V&V Leadership & Governance": [
-        "Test Governance",
-        "V&V Strategy",
-        "Test Risk Management",
-        "Stakeholder Communication",
-        "Vendor & Third-Party Testing",
-        "Test Capability Maturity",
-        "Mentoring & Coaching Test Teams"
-      ]
-    },
     "HW Engineering": {
-      "Core Hardware Engineering Foundations": [
-        "Hardware Engineering Principles",
-        "Electronic Systems Fundamentals",
-        "Digital & Analog Electronics",
-        "Power Systems Fundamentals",
-        "Embedded Hardware Basics",
-        "Hardware Architecture Concepts",
-        "Systems Thinking for Hardware",
-        "Hardware Design Trade-offs",
-        "Hardware Documentation & Schematics"
+      "Device Integration & Diagnostics": [
+        "Hardware Diagnostics & Telemetry",
+        "Peripheral Integration (NFC, Contactless, Sensors)",
+        "Interface Protocols (SPI, I2C, UART)",
+        "OTA Firmware Updates",
+        "Field Device Troubleshooting",
+        "Serial & Network Protocol Integration",
+        "Device Configuration Management",
+        "Integration with Back-Office Systems",
+        "Diagnostic Log Analysis",
+        "Remote Device Monitoring"
       ],
-      "Requirements & Hardware Design": [
-        "Hardware Requirements Definition",
-        "Environmental Requirements Analysis",
-        "Regulatory & Compliance Requirements",
-        "Electrical Design",
-        "Mechanical Design",
-        "Electro-Mechanical Integration",
-        "Power Budgeting",
-        "Thermal Design",
-        "Human Factors in Hardware Design",
-        "Design for Maintainability"
+      "Embedded Systems Engineering": [
+        "Firmware Development",
+        "Embedded C/C++ Development",
+        "RTOS Configuration & Optimization",
+        "Device Driver Development",
+        "Hardware-Software Integration",
+        "Bootloader Development",
+        "Memory Management (Embedded)",
+        "Interrupt Handling & Timing Optimization",
+        "Low-Power System Design",
+        "Embedded Security Implementation"
       ],
-      "Embedded & Control Hardware": [
-        "Microcontroller-Based Design",
-        "Processor & SoC Selection",
-        "Memory & Storage Design",
-        "Peripheral Interface Design",
-        "Sensor Integration",
-        "Actuator & Motor Control",
-        "Hardware–Firmware Co-Design",
-        "Boot & Secure Startup Hardware"
+      "Hardware Design & Architecture": [
+        "Digital Circuit Design",
+        "Analog Circuit Design",
+        "PCB Design & Layout",
+        "Microcontroller & SoC Architecture",
+        "Signal Integrity Analysis",
+        "Power Electronics Design",
+        "High-Speed Interface Design",
+        "FPGA Design & Programming",
+        "Hardware Architecture Documentation",
+        "Component Selection & Trade Studies"
       ],
-      "Interfaces, Communications & Connectivity": [
-        "Hardware Interface Design",
-        "Serial & Parallel Interfaces",
-        "Network Interface Hardware",
-        "Contactless & RFID Hardware",
-        "Secure Element & SAM Integration",
-        "Peripheral & Device Connectivity",
-        "External System Interfacing"
+      "Hardware Verification & Validation": [
+        "Hardware Test Planning",
+        "Environmental & Stress Testing",
+        "Hardware-in-the-Loop Testing",
+        "Compliance & Standards Testing",
+        "Failure Analysis & Debugging",
+        "Thermal Testing & Analysis",
+        "EMI/EMC Testing",
+        "Regression Testing (Hardware)",
+        "Prototype Validation Testing",
+        "Test Automation for Hardware"
       ],
-      "Payment, Security & Trust Hardware": [
-        "Secure Hardware Design",
-        "Hardware-Based Cryptography",
-        "Key Management Hardware",
-        "Tamper Detection & Resistance",
-        "Secure Enclosures",
-        "Compliance with Payment Standards",
-        "Trusted Execution Environments"
-      ],
-      "Mechanical & Industrial Design": [
-        "Industrial Design for Public Use",
-        "Enclosure Design",
-        "Environmental Sealing (IP Ratings)",
-        "Structural Integrity",
-        "Vibration & Shock Resistance",
-        "Thermal Management (Passive / Active)",
-        "Accessibility & Ergonomics",
-        "Materials Selection"
-      ],
-      "Manufacturing & Producibility": [
-        "Design for Manufacturability (DFM)",
-        "Design for Assembly (DFA)",
-        "Design for Testability (DFT)",
-        "Component Selection & Lifecycle",
-        "Supply Chain Constraints",
-        "Cost Optimization",
-        "Prototyping & Pilot Builds",
-        "Manufacturing Process Support"
-      ],
-      "Verification, Validation & Compliance": [
-        "Hardware Verification Planning",
-        "Electrical Verification",
-        "Mechanical Verification",
-        "Environmental Testing",
-        "EMC / EMI Testing",
-        "Safety Testing",
-        "Compliance Certification Support",
-        "Field Validation & Acceptance"
-      ],
-      "Deployment & Field Operations": [
-        "Installation Planning",
-        "Site Integration",
-        "Power & Network Integration",
-        "Commissioning",
-        "Field Diagnostics",
-        "Maintenance Procedures",
-        "Hardware Replacement & Upgrades",
-        "Decommissioning"
-      ],
-      "Reliability, Availability & Maintainability": [
-        "Reliability Engineering",
-        "Failure Mode Analysis",
-        "Mean Time Between Failures (MTBF)",
-        "Maintainability Analysis",
-        "Spare Parts Strategy",
-        "Obsolescence Management",
-        "Lifecycle Support Planning"
-      ],
-      "Safety, Environmental & Regulatory": [
-        "System Safety Engineering",
-        "Electrical Safety",
-        "Environmental Impact Considerations",
-        "Accessibility Compliance",
-        "Public Infrastructure Regulations",
-        "Regional & International Standards",
-        "Audit & Regulatory Support"
-      ],
-      "Hardware Engineering Leadership & Collaboration": [
-        "Hardware Technical Leadership",
-        "Cross-Discipline Collaboration",
-        "Supplier & Vendor Management",
-        "Engineering Reviews & Gateways",
-        "Risk & Issue Management",
-        "Mentoring & Coaching",
-        "Technical Communication"
+      "Reliability & Safety Engineering": [
+        "Reliability Modeling & MTBF Analysis",
+        "Safety-Critical System Design",
+        "Root Cause Analysis (RCA)",
+        "Risk & Hazard Analysis (FMEA, FTA)",
+        "Regulatory Compliance (EMC, CE, UL)",
+        "Redundancy & Failover Design",
+        "Lifecycle & Obsolescence Management",
+        "Safety Certification Processes",
+        "Quality Assurance Processes (Hardware)",
+        "Field Failure Analysis"
       ]
     },
     "IT Infra and App Ops": {
-      "Core IT Operations Foundations": [
-        "IT Operations Fundamentals",
-        "Production Support Mindset",
-        "Availability & Reliability Concepts",
-        "Incident, Problem & Change Awareness",
-        "Operations Readiness & Stability"
+      "Application Operations & Support": [
+        "Production Application Support",
+        "Release & Deployment Management",
+        "Monitoring & Observability",
+        "Batch & Job Scheduling Management",
+        "Performance Tuning & Optimization",
+        "Application Configuration Management",
+        "Log Analysis & Troubleshooting",
+        "Patch & Upgrade Management",
+        "Environment Management (Dev/Test/Prod)",
+        "End-User Support Escalation"
       ],
-      "Environment Setup & Transition (D&B)": [
-        "Infrastructure Setup Support",
-        "Application Deployment Support",
-        "Cloud Environment Provisioning",
-        "On-Premises Environment Setup",
-        "Network & Connectivity Setup",
-        "Environment Segregation (Dev/Test/Prod)",
-        "Go-Live & Cutover Support",
-        "Transition to Operations"
+      "Devops & Reliability Engineering": [
+        "Infrastructure as Code (Terraform, CloudFormation)",
+        "CI/CD Pipeline Management",
+        "Containerization (Docker, Kubernetes)",
+        "Site Reliability Engineering (SRE) Practices",
+        "Automation & Scripting (Python, Bash, PowerShell)",
+        "Release Automation",
+        "Blue/Green & Canary Deployments",
+        "Observability Engineering",
+        "Chaos Engineering",
+        "Platform Engineering Practices"
       ],
-      "Monitoring, Logging & Observability": [
-        "Infrastructure Monitoring",
-        "Application Monitoring",
-        "System Health Dashboards",
-        "Log Analysis",
-        "Alert Correlation & Noise Reduction",
-        "Performance & Capacity Monitoring"
+      "Infrastructure Engineering": [
+        "Cloud Infrastructure (AWS/Azure/GCP)",
+        "Network Engineering & Administration",
+        "Server & Virtualization Management",
+        "Storage & Backup Management",
+        "Disaster Recovery & Business Continuity",
+        "Infrastructure Monitoring & Alerting",
+        "Hybrid Cloud Architecture",
+        "Load Balancing & Traffic Management",
+        "Infrastructure Security Hardening",
+        "Data Center Operations"
       ],
-      "Operations & Maintenance (O&M)": [
-        "Day-to-Day Operational Support",
-        "Preventive Maintenance",
-        "Performance Tuning",
-        "Configuration Changes",
-        "Environment Stability Management",
-        "Patch & Upgrade Execution"
+      "It Governance & Security Operations": [
+        "Vulnerability Management",
+        "IT Controls & Compliance",
+        "Access & Identity Management",
+        "Security Monitoring & Incident Response",
+        "Risk Assessment & Mitigation",
+        "Audit & Regulatory Compliance",
+        "Data Protection & Encryption",
+        "Policy & Standards Development",
+        "Business Continuity Planning",
+        "Third-Party Risk Management"
       ],
-      "Incident, Problem & Ticket Resolution": [
-        "Incident Resolution (L2/L3)",
-        "Ticket Investigation & Diagnosis",
-        "Major Incident Technical Support",
-        "Root Cause Analysis",
-        "Problem Management",
-        "Escalation Handling"
+      "It Service Management": [
+        "Change Management",
+        "Incident management",
+        "Problem management",
+        "Knowledge management",
+        "Service level management",
+        "Availability management",
+        "Capacity management",
+        "Configuration Management (CMDB)",
+        "Major Incident Management",
+        "Service Request Management"
+      ]
+    },
+    "Software Engineering": {
+      "Advice And Guidance": [
+        "Consultancy",
+        "Specialist advice",
+        "Methods and tools"
       ],
-      "Application & Service Support": [
-        "Application Restart & Recovery",
-        "Defect Triage & Analysis",
-        "Functional Issue Investigation",
-        "Transaction & Batch Monitoring",
-        "Integration & Interface Support"
+      "Change Analysis": [
+        "Business situation analysis",
+        "Feasibility assessment",
+        "Requirements definition and management",
+        "Business modelling",
+        "User acceptance testing"
       ],
-      "Data & Integration Operations": [
-        "API & Interface Monitoring",
-        "Batch & Job Execution Support",
-        "Data Flow Validation",
-        "Data Reconciliation Support",
-        "Third-Party System Coordination"
+      "Change Implementation": [
+        "Portfolio management",
+        "Program management",
+        "Project management",
+        "Portfolio, program and project support",
+        "Delivery management"
       ],
-      "Security & Access Operations": [
-        "Identity & Access Resolution",
-        "Role & Permission Resolution",
-        "Certificate & Key Management",
-        "Vulnerability & Patch Management",
-        "Security Incident Technical Support"
+      "Change Planning": [
+        "Business process improvement",
+        "Organizational change enablement",
+        "Organizational capability development",
+        "Organization design and implementation",
+        "Job analysis and design",
+        "Organizational change management"
       ],
-      "Backup, Recovery & Continuity": [
-        "Backup & Restore Support",
-        "Disaster Recovery Support",
-        "Failover & High Availability Support",
-        "Business Continuity Support"
+      "Computational Science": [
+        "Scientific modelling",
+        "Numerical analysis",
+        "High-performance computing"
       ],
-      "Automation & Tooling": [
-        "Operational Automation",
-        "Diagnostic & Remediation Scripting",
-        "Monitoring Tool Configuration",
-        "Job Scheduling Tools",
-        "Configuration Management Tools"
+      "Content Management": [
+        "Content design and authoring",
+        "Content publishing",
+        "Knowledge management",
+        "Graphic design"
       ],
-      "Release, Change & Configuration": [
-        "Change Implementation",
-        "Release & Deployment Support",
+      "Data And Analytics": [
+        "Data management",
+        "Data modelling and design",
+        "Database design",
+        "Data analytics",
+        "Data science",
+        "Machine learning",
+        "Business intelligence",
+        "Data engineering",
+        "Data visualization"
+      ],
+      "Data And Records Operations": [
+        "Records management",
+        "Analytical classification and coding",
+        "Database administration"
+      ],
+      "Financial And Value Management": [
+        "Financial management",
+        "Investment appraisal",
+        "Benefits management",
+        "Budgeting and forecasting",
+        "Financial analysis",
+        "Cost management",
+        "Demand management",
+        "Measurement"
+      ],
+      "Governance, Risk And Compliance": [
+        "Governance",
+        "Risk management",
+        "Artificial intelligence (AI) and data ethics",
+        "Audit",
+        "Quality management",
+        "Quality assurance"
+      ],
+      "Marketing": [
+        "Marketing management",
+        "Market research",
+        "Brand management",
+        "Marketing campaign management",
+        "Customer engagement and loyalty",
+        "Digital marketing"
+      ],
+      "People Management": [
+        "Performance management",
+        "Employee experience",
+        "Organizational facilitation",
+        "Professional development",
+        "Workforce planning",
+        "Resourcing"
+      ],
+      "Sales And Bid Management": [
+        "Bid/proposal management",
+        "Selling",
+        "Sales support"
+      ],
+      "Security And Privacy": [
+        "Information security",
+        "Information assurance",
+        "Threat intelligence",
+        "Information and data compliance",
+        "Vulnerability research"
+      ],
+      "Security Services": [
+        "Identity and access management",
+        "Security operations",
+        "Vulnerability assessment",
+        "Digital forensics",
+        "Cybercrime investigation",
+        "Offensive cyber operations",
+        "Penetration testing"
+      ],
+      "Service Management": [
+        "Incident management",
+        "Problem management",
+        "Service level management",
+        "Service catalogue management",
+        "Availability management",
+        "Continuity management",
+        "Capacity management",
+        "Change control",
+        "Asset management",
+        "Service acceptance"
+      ],
+      "Skills Management": [
+        "Learning and development management",
+        "Learning design and development",
+        "Learning delivery",
+        "Competency assessment",
+        "Certification scheme operation",
+        "Teaching",
+        "Subject formation"
+      ],
+      "Stakeholder Management": [
+        "Sourcing",
+        "Supplier management",
+        "Contract management",
+        "Stakeholder relationship management",
+        "Customer service support",
+        "Business administration"
+      ],
+      "Strategy And Planning": [
+        "Information Management",
+        "Strategic planning",
+        "Information systems coordination",
+        "Enterprise and business architecture",
+        "Solution architecture",
+        "Innovation management",
+        "Emerging technology monitoring",
+        "Formal research",
+        "Sustainability"
+      ],
+      "Systems Development": [
+        "Functional testing",
+        "Product management",
+        "Systems development management",
+        "Systems and software lifecycle engineering",
+        "Systems design",
+        "Software design",
+        "Network design",
+        "Infrastructure design",
+        "Hardware design",
+        "Programming/software development",
+        "Systems integration and build",
+        "Non-functional testing",
+        "Process testing",
+        "Software configuration",
+        "Real-time/embedded systems development",
+        "Safety engineering",
+        "Safety assessment",
+        "Radio frequency engineering",
+        "Animation development"
+      ],
+      "Technology Management": [
         "Configuration Management",
-        "Rollback & Recovery Support"
+        "Technology service management",
+        "Application support",
+        "Infrastructure operations",
+        "System software administration",
+        "Network support",
+        "Systems installation and removal",
+        "Release management",
+        "Storage management",
+        "Facilities management",
+        "Deployment"
       ],
-      "Testing & Validation Support": [
-        "Production Validation",
-        "Smoke & Sanity Testing",
-        "Post-Deployment Verification",
-        "Defect Fix Verification"
+      "User Centered Design": [
+        "User research",
+        "Customer experience",
+        "Accessibility and inclusion",
+        "User experience analysis",
+        "User experience design",
+        "User experience evaluation"
+      ]
+    },
+    "Systems Engineering": {
+      "Core": [
+        "Capability Engineering",
+        "Critical Thinking",
+        "General Engineering",
+        "Lifecycles",
+        "Systems Modeling & Analysis",
+        "Systems Thinking"
       ],
-      "Governance, Reporting & Compliance": [
-        "SLA / OLA Contribution",
-        "Operational Metrics & Reporting",
-        "Audit & Compliance Evidence Support",
-        "Operational Documentation"
+      "Management": [
+        "Acquisition & Supply",
+        "Business & Enterprise Integration",
+        "Concurrent Engineering",
+        "Configuration Management",
+        "Decision Management",
+        "Information Management",
+        "Monitoring & Control",
+        "Planning",
+        "Risk & Opportunity Management"
       ],
-      "Collaboration & Operations Leadership": [
-        "Collaboration with Service Desk",
-        "Coordination with Engineering Teams",
-        "Vendor & Third-Party Coordination",
-        "Knowledge Base & Runbooks",
-        "Continuous Service Improvement"
+      "Professional": [
+        "Coaching & Mentoring",
+        "Communications",
+        "Emotional Intelligence",
+        "Ethics & Professionalism",
+        "Facilitation",
+        "Negotiation",
+        "Team Dynamics",
+        "Technical Leadership"
+      ],
+      "Systems Context": [
+        "Principal and Relevant Systems",
+        "Relevant Domains & Technologies",
+        "System of Systems Engineering",
+        "System’s Concept of Operations"
+      ],
+      "Technical": [
+        "Cybersecurity",
+        "Integration",
+        "Interfaces",
+        "Requirements Definition",
+        "Retirement",
+        "Systems Architecting",
+        "Transition",
+        "Utilization & Support",
+        "Validation",
+        "Verification",
+        "Design For…"
+      ]
+    },
+    "V&V Testing": {
+      "Agile Testing": [
+        "Continuous Testing",
+        "Shift-Left Testing",
+        "Agile Principles",
+        "Test-Driven Development"
+      ],
+      "Automation": [
+        "Automation Strategy",
+        "Framework Design",
+        "CI/CD Integration",
+        "Scripting",
+        "Tool Selection"
+      ],
+      "Non-Functional": [
+        "Performance Testing",
+        "Reliability Testing",
+        "Security Testing",
+        "Usability Testing",
+        "Compatibility Testing"
+      ],
+      "Test Design": [
+        "Exploratory Testing",
+        "Requirements Analysis",
+        "Equivalence Partitioning",
+        "Boundary Value Analysis",
+        "Decision Table Testing",
+        "State Transition Testing",
+        "Use Case Testing"
+      ],
+      "Test Management": [
+        "Defect Management",
+        "Risk-Based Testing",
+        "Stakeholder Communication",
+        "Test Planning",
+        "Estimation",
+        "Metrics & Reporting"
+      ],
+      "Testing Foundations": [
+        "Testing Principles",
+        "SDLC Integration",
+        "Static Testing",
+        "Test Levels",
+        "Test Types"
+      ],
+      "Tools": [
+        "Data management",
+        "Test Management Tools",
+        "Defect Tracking",
+        "Version Control",
+        "Environment Setup"
       ]
     }
   },
@@ -649,14 +427,13 @@ const SKILLS_DATA = {
         "CMC",
         "NIS"
       ],
-      "Payments & Tokenization": [
-        "ABP – Account-Based Processor",
-        "CPA – Cubic Payment Application",
-        "EMV – Cubic Payment Application",
-        "PAL – Payment Abstraction Layer",
-        "VTM – Virtual Token Manager (Account-Based)",
-        "VTM – Virtual Token Manager (Card-Based)",
-        "IFD – Intelligent Fraud Detection"
+      "Customer & Account Management": [
+        "CMS – Customer Management System",
+        "CXS – Customer eXtended Service",
+        "MSD CRM – Microsoft Dynamics CRM",
+        "OAM – OneAccount Manager",
+        "OMS – Order Management System",
+        "ProdCat – Product Catalog"
       ],
       "Financial & Clearing": [
         "CCH – Central ClearingHouse",
@@ -664,21 +441,99 @@ const SKILLS_DATA = {
         "MSD FO – Finance",
         "MSD FO – IMS"
       ],
-      "Customer & Account Management": [
-        "OMS – Order Management System",
-        "OAM – OneAccount Manager",
-        "CMS – Customer Management System",
-        "MSD CRM – Microsoft Dynamics CRM",
-        "CXS – Customer eXtended Service",
-        "ProdCat – Product Catalog"
+      "Its Experience": [
+        "Intelligent Congestion Management Program (ICMP)",
+        "Traffic Management Platform (TMP)",
+        "Product - Apollo",
+        "Product - Themis",
+        "Product - Gridsmart",
+        "Tolling Systems"
+      ],
+      "Legacy Solutions": [
+        "AFC - Mobile",
+        "AFC - Payments",
+        "CRM - Pivotal",
+        "CRM - SalesForce",
+        "Ventra2 Backoffice",
+        "LA Legacy"
       ],
       "Notifications & Engagement": [
         "CNG – Cubic Notification Gateway"
+      ],
+      "Payments & Tokenization": [
+        "ABP – Account-Based Processor",
+        "CPA – Cubic Payment Application",
+        "EMV – Cubic Payment Application",
+        "IFD – Intelligent Fraud Detection",
+        "PAL – Payment Abstraction Layer",
+        "VTM – Virtual Token Manager (Account-Based)",
+        "VTM – Virtual Token Manager (Card-Based)"
+      ],
+      "Program Experience": [
+        "San Francisco Clipper",
+        "Los Angeles Metro",
+        "Chicago Ventra 3",
+        "Vancouver",
+        "Minneapolis Metro Transit",
+        "Boston MBTA",
+        "New York OMNY",
+        "NJ PATCO",
+        "New Jersey / New York PATH",
+        "Philadelphia SEPTA",
+        "Miami",
+        "Baltimore",
+        "Washington WMATA",
+        "London TfL",
+        "Sydney TfNSW",
+        "Brisbane NGTS",
+        "Tasmania Metro TAS",
+        "New Zealand NTS",
+        "Singapore LTA"
       ]
     }
   },
   "Technical": {
     "General": {
+      "Back-End Engineering": [
+        "Java",
+        "C#",
+        "Python",
+        "Node.js",
+        "Go",
+        "RESTful API Design",
+        "GraphQL",
+        "Authentication & Authorization (OAuth2, JWT)"
+      ],
+      "Cloud & Infrastructure": [
+        "AWS",
+        "Azure",
+        "Google Cloud Platform",
+        "Infrastructure as Code (Terraform, CloudFormation)",
+        "Kubernetes",
+        "Docker",
+        "CI/CD Pipelines",
+        "Cloud Networking"
+      ],
+      "Data Engineering & Analytics": [
+        "SQL",
+        "NoSQL Databases (MongoDB, Cassandra)",
+        "Apache Kafka",
+        "Apache Spark",
+        "Power BI",
+        "Tableau",
+        "ETL / ELT Pipelines",
+        "Data Warehousing (Snowflake, Redshift, BigQuery)",
+        "Real-Time Data Processing"
+      ],
+      "Embedded & Hardware Engineering": [
+        "C / C++",
+        "Embedded Linux",
+        "RTOS",
+        "Firmware Development",
+        "Device Drivers",
+        "Hardware/Software Integration",
+        "Hardware Diagnostics & Telemetry"
+      ],
       "Front-End Engineering": [
         "JavaScript (ES6+)",
         "TypeScript",
@@ -690,28 +545,7 @@ const SKILLS_DATA = {
         "State Management (Redux, NgRx, MobX)",
         "UI Performance Optimization"
       ],
-      "Back-End Engineering": [
-        "Java",
-        "C#",
-        "Python",
-        "Node.js",
-        "Go",
-        "RESTful API Design",
-        "GraphQL",
-        "Authentication & Authorization (OAuth2, JWT)"
-      ],
-      "Data Engineering & Analytics": [
-        "SQL",
-        "NoSQL Databases (MongoDB, Cassandra)",
-        "ETL / ELT Pipelines",
-        "Apache Kafka",
-        "Apache Spark",
-        "Data Warehousing (Snowflake, Redshift, BigQuery)",
-        "Power BI",
-        "Tableau",
-        "Real-Time Data Processing"
-      ],
-      "Machine Learning & AI": [
+      "Machine Learning & Ai": [
         "Python (ML Stack)",
         "R",
         "Scikit-learn",
@@ -722,15 +556,6 @@ const SKILLS_DATA = {
         "Time Series Analysis",
         "MLOps / Model Deployment",
         "Feature Engineering"
-      ],
-      "Embedded & Hardware Engineering": [
-        "C / C++",
-        "Embedded Linux",
-        "RTOS",
-        "Firmware Development",
-        "Device Drivers",
-        "Hardware/Software Integration",
-        "Hardware Diagnostics & Telemetry"
       ],
       "Payments & Transaction Processing": [
         "ISO 8583",
@@ -751,59 +576,17 @@ const SKILLS_DATA = {
         "Batch Processing Systems",
         "Third-Party Vendor Integration",
         "Transit Agency System Interfaces"
-      ],
-      "Cloud & Infrastructure": [
-        "AWS",
-        "Azure",
-        "Google Cloud Platform",
-        "Infrastructure as Code (Terraform, CloudFormation)",
-        "Kubernetes",
-        "Docker",
-        "CI/CD Pipelines",
-        "Cloud Networking"
       ]
     }
   }
 };
 
-const JOB_FAMILIES = [
-  "General",
-  "HW Engineering",
-  "IT Infra and App Ops",
-  "Software Engineering",
-  "System Engineering",
-  "V&V Testing"
-];
+const JOB_FAMILIES = ["General", "HW Engineering", "IT Infra and App Ops", "Software Engineering", "Systems Engineering", "V&V Testing"];
 
 const PROFICIENCY_LEVELS = [
-  {
-    "level": 1,
-    "summary": "Awareness",
-    "description": "Awareness in this area, but limited experience",
-    "signals": "Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently"
-  },
-  {
-    "level": 2,
-    "summary": "Supervised Practitioner",
-    "description": "Knowledge of the skill, but requires guidance and supervision to perform tasks",
-    "signals": "Has applied skill in a limited or controlled setting with support from others"
-  },
-  {
-    "level": 3,
-    "summary": "Practitioner",
-    "description": "Deep understanding of the skill and can perform complex tasks independently",
-    "signals": "Regularly applies the skill independently on projects to high success"
-  },
-  {
-    "level": 4,
-    "summary": "Lead Practitioner",
-    "description": "Complete and comprehensive mastery of the skill and can lead, innovate, and train others",
-    "signals": "Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill"
-  },
-  {
-    "level": 5,
-    "summary": "Expert",
-    "description": "Expert",
-    "signals": "Recognized authority on skill, such as having published materials, presented externally, or defined standards"
-  }
+  { level: 1, summary: "Awareness", description: "Awareness in this area, but limited experience", signals: "Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently" },
+  { level: 2, summary: "Supervised Practitioner", description: "Knowledge of the skill, but requires guidance and supervision to perform tasks", signals: "Has applied skill in a limited or controlled setting with support from others" },
+  { level: 3, summary: "Practitioner", description: "Deep understanding of the skill and can perform complex tasks independently", signals: "Regularly applies the skill independently on projects to high success" },
+  { level: 4, summary: "Lead Practitioner", description: "Complete and comprehensive mastery of the skill and can lead, innovate, and train others", signals: "Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill" },
+  { level: 5, summary: "Expert", description: "Expert", signals: "Recognized authority on skill, such as having published materials, presented externally, or defined standards" }
 ];
