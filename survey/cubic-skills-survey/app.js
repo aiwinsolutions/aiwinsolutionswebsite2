@@ -53,7 +53,7 @@ function setupPage1Validation() {
     btn.disabled = !(employeeIdInput.value.trim() && jf.value);
   };
 
-  // When Employee ID changes, debounce a lookup after 500ms
+  // When Employee ID changes, trigger lookup immediately when 6 digits entered
   employeeIdInput.addEventListener('input', () => {
     const id = employeeIdInput.value.trim();
 
@@ -62,16 +62,24 @@ function setupPage1Validation() {
       jfGroup.style.display = 'none';
       btn.disabled = true;
       lastLookedUpId = '';
+      // Clear any error message
+      const errMsg = document.getElementById('employee-id-error');
+      if (errMsg) errMsg.style.display = 'none';
       return;
     }
 
-    // Debounce: wait 500ms after typing stops
-    clearTimeout(employeeIdLookupTimer);
-    employeeIdLookupTimer = setTimeout(() => {
-      if (id && id !== lastLookedUpId) {
-        lookupEmployeeId(id);
-      }
-    }, 500);
+    // Trigger immediately when exactly 6 digits are entered
+    if (/^\d{6}$/.test(id) && id !== lastLookedUpId) {
+      clearTimeout(employeeIdLookupTimer);
+      lookupEmployeeId(id);
+    } else if (id.length < 6) {
+      // Clear previous results while still typing
+      clearTimeout(employeeIdLookupTimer);
+      jfGroup.style.display = 'none';
+      btn.disabled = true;
+      const errMsg = document.getElementById('employee-id-error');
+      if (errMsg) errMsg.style.display = 'none';
+    }
   });
 
   // Also trigger lookup on blur (tab/click away)

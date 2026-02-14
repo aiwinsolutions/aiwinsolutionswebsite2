@@ -16,19 +16,19 @@ body {
 /* ========== Survey Container ========== */
 .survey-container {
   max-width: 960px;
-  margin: 30px auto;
+  margin: 10px auto;
   padding: 0 20px;
 }
 
 /* ========== Progress Bar ========== */
 .progress-bar-container {
   background: #fff;
-  border-radius: 12px;
-  padding: 20px 24px 14px;
-  margin-bottom: 24px;
+  border-radius: 8px;
+  padding: 10px 24px 8px;
+  margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   position: sticky;
-  top: 10px;
+  top: 4px;
   z-index: 100;
 }
 
@@ -43,7 +43,7 @@ body {
 .progress-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .progress-step {
@@ -67,7 +67,7 @@ body {
   display: none;
   background: #fff;
   border-radius: 12px;
-  padding: 36px 40px;
+  padding: 24px 40px 28px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   animation: fadeIn 0.3s ease;
 }
@@ -82,12 +82,12 @@ body {
 }
 
 h1 {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border-bottom: 3px solid #2563eb;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
 }
 
 h2 {
@@ -107,9 +107,9 @@ h3 {
 .survey-purpose {
   background: #f8fafc;
   border-left: 4px solid #2563eb;
-  padding: 20px 24px;
+  padding: 14px 24px;
   border-radius: 0 8px 8px 0;
-  margin: 20px 0 28px;
+  margin: 12px 0 20px;
 }
 
 .survey-purpose p {
