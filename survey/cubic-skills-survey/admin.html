@@ -505,7 +505,7 @@
       <div class="filter-panel">
         <h3>Filters</h3>
         <div class="filter-section">
-          <div class="filter-section-title">Job Family</div>
+          <div class="filter-section-title">Primary Job Family</div>
           <label class="filter-checkbox"><input type="checkbox" value="HW Engineering" checked> HW Engineering</label>
           <label class="filter-checkbox"><input type="checkbox" value="IT Infra and App Ops" checked> IT Infra &amp; App Ops</label>
           <label class="filter-checkbox"><input type="checkbox" value="Software Engineering" checked> Software Engineering</label>
@@ -1409,7 +1409,7 @@
         Object.entries(SKILLS_DATA).forEach(([skillType, families]) => {
           if (!activeSkillTypes.has(skillType)) return;
           Object.entries(families).forEach(([jf, clusters]) => {
-            if (!activeJobFamilies.has(jf)) return;
+            if (jf !== 'General' && !activeJobFamilies.has(jf)) return;
             Object.entries(clusters).forEach(([cluster, skillList]) => {
               skillList.forEach(skill => {
                 const count = skillFreq[skill] || 0;
