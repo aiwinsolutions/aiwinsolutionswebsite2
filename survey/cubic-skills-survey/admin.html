@@ -660,7 +660,12 @@
     // ========== Configuration ==========
     const SUPABASE_URL = 'https://izeamxdmfpvcadvskczf.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6ZWFteGRtZnB2Y2FkdnNrY3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzEwNzYsImV4cCI6MjA4NjUwNzA3Nn0.JPObhs93_BtEbclKTTbjZDVWC-gyDigwcXVAgq1quD4';
-    const ADMIN_PASSWORD = 'cubic@2026';
+    const ADMIN_PASSWORD_HASH = '31e65cef76ad92fbb0b12a2d32674d71d628dcb865732a012039bfaeb2e64807';
+    async function hashPassword(pwd) {
+      const data = new TextEncoder().encode(pwd);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
     const SESSION_KEY = 'survey_dashboard_session';
     const SESSION_DURATION = 60 * 60 * 1000;
 
@@ -690,8 +695,9 @@
       }
     })();
 
-    function authenticate() {
-      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
+    async function authenticate() {
+      const inputHash = await hashPassword(document.getElementById('passwordInput').value);
+      if (inputHash === ADMIN_PASSWORD_HASH) {
         const expiry = Date.now() + SESSION_DURATION;
         localStorage.setItem(SESSION_KEY, expiry.toString());
         showDashboard();
