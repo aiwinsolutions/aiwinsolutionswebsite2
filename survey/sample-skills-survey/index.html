@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Skills Survey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="survey-container">
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-labels">
+        <span class="progress-step active" data-page="1">Intro</span>
+        <span class="progress-step" data-page="2">Instructions</span>
+        <span class="progress-step" data-page="3">Competencies</span>
+        <span class="progress-step" data-page="4">SME</span>
+        <span class="progress-step" data-page="5">Technical</span>
+        <span class="progress-step" data-page="6">Submit</span>
+      </div>
+    </div>
+
+    <!-- Page 1: Introduction -->
+    <div class="page active" id="page1">
+      <h1>Sample Skills Survey</h1>
+      <div class="survey-purpose">
+        <h2>Survey Purpose</h2>
+        <p>We're building a solution to better understand the skills and experiences of our personnel to better understand the capabilities we're bringing to market. This survey helps us understand the full range of capabilities across our team and improve our staffing.</p>
+        <p>To start, please confirm your employee ID and primary job family within the organization.</p>
+      </div>
+      <table class="form-table">
+        <tr>
+          <td class="form-label-cell"><label for="employeeIdInput">Employee ID</label></td>
+          <td class="form-input-cell">
+            <input type="text" id="employeeIdInput" placeholder="Enter your employee ID" required>
+          </td>
+          <td class="form-error-cell">
+            <div class="validation-message" id="employee-id-error" style="display:none;"></div>
+          </td>
+        </tr>
+        <tr id="jobFamilyGroup" style="display:none;">
+          <td class="form-label-cell"><label for="jobFamilyInput">Job Family</label></td>
+          <td class="form-input-cell">
+            <select id="jobFamilyInput">
+              <option value="">-- Select Job Family --</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <div class="nav-buttons">
+        <div></div>
+        <button class="btn btn-next" id="btn-next-1" disabled>Next</button>
+      </div>
+    </div>
+
+    <!-- Page 2: Survey functionality -->
+    <div class="page" id="page2">
+      <h1>Survey functionality</h1>
+      <div class="instructions-content">
+        <p>This survey will provide you with a series of windows in which you can highlight your level of proficiency in 5 skills for 3 different skill types (15 total skills).</p>
+        <ul class="skill-types-list">
+          <li><strong>Competencies:</strong> combination of skill, knowledge, ability & behavior reliably actionable in practice</li>
+          <li><strong>Technical subjects:</strong> programming and tooling skills (e.g., Java, SQL, Tableau)</li>
+          <li><strong>SME knowledge:</strong> knowledge specific to organization's process or function</li>
+        </ul>
+        <p>Each skill exists within a broader Cluster, within a Job Family. A diagram of the structure is included, below:</p>
+        <div class="structure-diagram">
+          <img src="skills-structure.png" alt="Skills structure diagram showing Skills Type, Skill Cluster, Skill, and Level hierarchy">
+        </div>
+        <p>Finally, proficiencies range from Level 1 to Level 5 based on the following matrix. Self reported skills will be reviewed with managers during performance management cycles going forward.</p>
+        <table class="proficiency-table">
+          <thead>
+            <tr>
+              <th>Level Rating</th>
+              <th>Level Summary</th>
+              <th>Level Description</th>
+              <th>Example Signals</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Level 1</td>
+              <td>Awareness</td>
+              <td>Awareness in this area, but limited experience</td>
+              <td>Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently</td>
+            </tr>
+            <tr>
+              <td>Level 2</td>
+              <td>Supervised Practitioner</td>
+              <td>Knowledge of the skill, but requires guidance and supervision to perform tasks</td>
+              <td>Has applied skill in a limited or controlled setting with support from others</td>
+            </tr>
+            <tr>
+              <td>Level 3</td>
+              <td>Practitioner</td>
+              <td>Deep understanding of the skill and can perform complex tasks independently</td>
+              <td>Regularly applies the skill independently on projects to high success</td>
+            </tr>
+            <tr>
+              <td>Level 4</td>
+              <td>Lead Practitioner</td>
+              <td>Complete and comprehensive mastery of the skill and can lead, innovate, and train others</td>
+              <td>Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill</td>
+            </tr>
+            <tr>
+              <td>Level 5</td>
+              <td>Expert</td>
+              <td>Expert</td>
+              <td>Recognized authority on skill, such as having published materials, presented externally, or defined standards</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>A copy of the skills structure and the proficiency matrix will be included in each page for your reference, as needed.</p>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-2">Back</button>
+        <button class="btn btn-next" id="btn-next-2">Next</button>
+      </div>
+    </div>
+
+    <!-- Page 3: Competencies skill selection -->
+    <div class="page" id="page3">
+      <h1>Competencies Skills Section</h1>
+      <p class="page-description">Here you will be able to select up to 5 competencies. To input competencies, use the drop-down windows for each skill and then input your proficiency.</p>
+      <div class="grid-header" id="competency-header">
+        <div class="grid-header-num"></div>
+        <div class="grid-header-col">Job Family</div>
+        <div class="grid-header-col">Skill Cluster</div>
+        <div class="grid-header-col">Skill</div>
+        <div class="grid-header-col">Proficiency Level</div>
+      </div>
+      <div class="skills-grid compact" id="competency-grid">
+        <!-- 5 rows generated by JS -->
+      </div>
+      <div class="skills-reference">
+        <h2>Skills structure reference</h2>
+        <p><strong>Skills type</strong></p>
+        <ul class="skill-types-list">
+          <li><strong>Competencies:</strong> combination of skill, knowledge, ability & behavior reliably actionable in practice</li>
+          <li><strong>Technical subjects:</strong> programming and tooling skills (e.g., Java, SQL, Tableau)</li>
+          <li><strong>SME knowledge:</strong> knowledge specific to organization's process or function</li>
+        </ul>
+        <p>Each skill exists within a broader Cluster, within a Job Family. A diagram of the structure is included, below:</p>
+        <div class="structure-diagram">
+          <img src="skills-structure.png" alt="Skills structure diagram showing Skills Type, Skill Cluster, Skill, and Level hierarchy">
+        </div>
+        <p>Finally, proficiencies range from Level 1 to Level 5 based on the following matrix. Self reported skills will be reviewed with managers during performance management cycles going forward.</p>
+        <table class="proficiency-table">
+          <thead>
+            <tr>
+              <th>Level Rating</th>
+              <th>Level Summary</th>
+              <th>Level Description</th>
+              <th>Example Signals</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Level 1</td>
+              <td>Awareness</td>
+              <td>Awareness in this area, but limited experience</td>
+              <td>Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently</td>
+            </tr>
+            <tr>
+              <td>Level 2</td>
+              <td>Supervised Practitioner</td>
+              <td>Knowledge of the skill, but requires guidance and supervision to perform tasks</td>
+              <td>Has applied skill in a limited or controlled setting with support from others</td>
+            </tr>
+            <tr>
+              <td>Level 3</td>
+              <td>Practitioner</td>
+              <td>Deep understanding of the skill and can perform complex tasks independently</td>
+              <td>Regularly applies the skill independently on projects to high success</td>
+            </tr>
+            <tr>
+              <td>Level 4</td>
+              <td>Lead Practitioner</td>
+              <td>Complete and comprehensive mastery of the skill and can lead, innovate, and train others</td>
+              <td>Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill</td>
+            </tr>
+            <tr>
+              <td>Level 5</td>
+              <td>Expert</td>
+              <td>Expert</td>
+              <td>Recognized authority on skill, such as having published materials, presented externally, or defined standards</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-3">Back</button>
+        <button class="btn btn-next" id="btn-next-3">Next</button>
+      </div>
+    </div>
+
+    <!-- Page 4: SME skill selection -->
+    <div class="page" id="page4">
+      <h1>SME Skills Section</h1>
+      <p class="page-description">Here you will be able to select up to 5 competencies. To input competencies, use the drop-down windows for each skill and then input your proficiency.</p>
+      <div class="grid-header" id="sme-header">
+        <div class="grid-header-num"></div>
+        <div class="grid-header-col">Job Family</div>
+        <div class="grid-header-col">Skill Cluster</div>
+        <div class="grid-header-col">Skill</div>
+        <div class="grid-header-col">Proficiency Level</div>
+      </div>
+      <div class="skills-grid compact" id="sme-grid">
+        <!-- 5 rows generated by JS -->
+      </div>
+      <div class="skills-reference">
+        <h2>Skills structure reference</h2>
+        <p><strong>Skills type</strong></p>
+        <ul class="skill-types-list">
+          <li><strong>Competencies:</strong> combination of skill, knowledge, ability & behavior reliably actionable in practice</li>
+          <li><strong>Technical subjects:</strong> programming and tooling skills (e.g., Java, SQL, Tableau)</li>
+          <li><strong>SME knowledge:</strong> knowledge specific to organization's process or function</li>
+        </ul>
+        <p>Each skill exists within a broader Cluster, within a Job Family. A diagram of the structure is included, below:</p>
+        <div class="structure-diagram">
+          <img src="skills-structure.png" alt="Skills structure diagram showing Skills Type, Skill Cluster, Skill, and Level hierarchy">
+        </div>
+        <p>Finally, proficiencies range from Level 1 to Level 5 based on the following matrix. Self reported skills will be reviewed with managers during performance management cycles going forward.</p>
+        <table class="proficiency-table">
+          <thead>
+            <tr>
+              <th>Level Rating</th>
+              <th>Level Summary</th>
+              <th>Level Description</th>
+              <th>Example Signals</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Level 1</td>
+              <td>Awareness</td>
+              <td>Awareness in this area, but limited experience</td>
+              <td>Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently</td>
+            </tr>
+            <tr>
+              <td>Level 2</td>
+              <td>Supervised Practitioner</td>
+              <td>Knowledge of the skill, but requires guidance and supervision to perform tasks</td>
+              <td>Has applied skill in a limited or controlled setting with support from others</td>
+            </tr>
+            <tr>
+              <td>Level 3</td>
+              <td>Practitioner</td>
+              <td>Deep understanding of the skill and can perform complex tasks independently</td>
+              <td>Regularly applies the skill independently on projects to high success</td>
+            </tr>
+            <tr>
+              <td>Level 4</td>
+              <td>Lead Practitioner</td>
+              <td>Complete and comprehensive mastery of the skill and can lead, innovate, and train others</td>
+              <td>Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill</td>
+            </tr>
+            <tr>
+              <td>Level 5</td>
+              <td>Expert</td>
+              <td>Expert</td>
+              <td>Recognized authority on skill, such as having published materials, presented externally, or defined standards</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-4">Back</button>
+        <button class="btn btn-next" id="btn-next-4">Next</button>
+      </div>
+    </div>
+
+    <!-- Page 5: Technical skill selection -->
+    <div class="page" id="page5">
+      <h1>Technical Skills Section</h1>
+      <p class="page-description">Here you will be able to select up to 5 competencies. To input competencies, use the drop-down windows for each skill and then input your proficiency.</p>
+      <div class="grid-header" id="technical-header">
+        <div class="grid-header-num"></div>
+        <div class="grid-header-col">Job Family</div>
+        <div class="grid-header-col">Skill Cluster</div>
+        <div class="grid-header-col">Skill</div>
+        <div class="grid-header-col">Proficiency Level</div>
+      </div>
+      <div class="skills-grid compact" id="technical-grid">
+        <!-- 5 rows generated by JS -->
+      </div>
+      <div class="skills-reference">
+        <h2>Skills structure reference</h2>
+        <p><strong>Skills type</strong></p>
+        <ul class="skill-types-list">
+          <li><strong>Competencies:</strong> combination of skill, knowledge, ability & behavior reliably actionable in practice</li>
+          <li><strong>Technical subjects:</strong> programming and tooling skills (e.g., Java, SQL, Tableau)</li>
+          <li><strong>SME knowledge:</strong> knowledge specific to organization's process or function</li>
+        </ul>
+        <p>Each skill exists within a broader Cluster, within a Job Family. A diagram of the structure is included, below:</p>
+        <div class="structure-diagram">
+          <img src="skills-structure.png" alt="Skills structure diagram showing Skills Type, Skill Cluster, Skill, and Level hierarchy">
+        </div>
+        <p>Finally, proficiencies range from Level 1 to Level 5 based on the following matrix. Self reported skills will be reviewed with managers during performance management cycles going forward.</p>
+        <table class="proficiency-table">
+          <thead>
+            <tr>
+              <th>Level Rating</th>
+              <th>Level Summary</th>
+              <th>Level Description</th>
+              <th>Example Signals</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Level 1</td>
+              <td>Awareness</td>
+              <td>Awareness in this area, but limited experience</td>
+              <td>Exposed to the skill through training or shadowing; can discuss basic concepts but has not applied skill independently</td>
+            </tr>
+            <tr>
+              <td>Level 2</td>
+              <td>Supervised Practitioner</td>
+              <td>Knowledge of the skill, but requires guidance and supervision to perform tasks</td>
+              <td>Has applied skill in a limited or controlled setting with support from others</td>
+            </tr>
+            <tr>
+              <td>Level 3</td>
+              <td>Practitioner</td>
+              <td>Deep understanding of the skill and can perform complex tasks independently</td>
+              <td>Regularly applies the skill independently on projects to high success</td>
+            </tr>
+            <tr>
+              <td>Level 4</td>
+              <td>Lead Practitioner</td>
+              <td>Complete and comprehensive mastery of the skill and can lead, innovate, and train others</td>
+              <td>Serves as a go-to resource on skill, mentors others, sets best practices, and leads workstreams requiring skill</td>
+            </tr>
+            <tr>
+              <td>Level 5</td>
+              <td>Expert</td>
+              <td>Expert</td>
+              <td>Recognized authority on skill, such as having published materials, presented externally, or defined standards</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-5">Back</button>
+        <button class="btn btn-next" id="btn-next-5">Next</button>
+      </div>
+    </div>
+
+    <!-- Page 6: Closing -->
+    <div class="page" id="page6">
+      <h1>Submit Your Survey</h1>
+      <div class="closing-content">
+        <div class="summary-section" id="responseSummary">
+          <!-- Populated by JS -->
+        </div>
+        <div class="certification">
+          <label class="checkbox-label">
+            <input type="checkbox" id="certifyCheckbox">
+            <span>I certify that I have provided my skills to the best of my ability.</span>
+          </label>
+        </div>
+        <p class="thank-you-text">Thank you for sharing some of your skills and capabilities. This information helps us to better understand the overall skill profile of the organization and identify growth opportunities across the organization.</p>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-6">Back</button>
+        <button class="btn btn-submit" id="btn-submit" disabled>Submit</button>
+      </div>
+      <!-- Success message (hidden by default) -->
+      <div class="success-message" id="successMessage" style="display:none;">
+        <div class="success-icon">&#10003;</div>
+        <h2>Survey Submitted Successfully!</h2>
+        <p>Your responses have been recorded. Thank you for your participation.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="employee-ids.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

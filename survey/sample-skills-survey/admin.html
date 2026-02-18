@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Survey Dashboard</title>
+  <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a2e;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ========== Login Screen ========== */
+    .login-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+    .login-box {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 28px 32px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-box h1 { font-size: 1.25rem; color: #333; margin-bottom: 4px; border: none; }
+    .login-box .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+    .login-box .form-group { margin-bottom: 16px; text-align: left; }
+    .login-box label { display: block; font-weight: 600; margin-bottom: 6px; color: #444; font-size: 0.9rem; }
+    .login-box input[type="password"] {
+      width: 100%; padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px;
+      font-size: 1rem; transition: border-color 0.2s;
+    }
+    .login-box input[type="password"]:focus { outline: none; border-color: #7c18ae; }
+    .login-btn {
+      display: inline-block; padding: 12px 32px; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; background: #7c18ae; color: #fff; width: 100%;
+      transition: background 0.2s;
+    }
+    .login-btn:hover { background: #6a1496; }
+    .login-error { color: #dc2626; font-size: 0.85rem; margin-top: 10px; display: none; }
+
+    /* ========== Dashboard Shell ========== */
+    .dashboard-shell { display: none; min-height: 100vh; }
+
+    /* Top Bar */
+    .top-bar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .top-bar-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-right: 32px;
+      white-space: nowrap;
+    }
+    .tab-nav { display: flex; gap: 4px; flex: 1; }
+    .tab-btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: #64748b;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab-btn:hover { background: #f3e8f9; color: #7c18ae; }
+    .tab-btn.active { background: #7c18ae; color: #fff; }
+    .top-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: 16px;
+    }
+    .top-action-link {
+      color: #7c18ae;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .top-action-link:hover { color: #6a1496; text-decoration: underline; }
+    .top-action-link.sign-out { color: #64748b; font-weight: 500; }
+    .top-action-link.sign-out:hover { color: #dc2626; }
+
+    /* Main Layout */
+    .main-layout {
+      display: flex;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    /* Left Filter Panel */
+    .filter-panel {
+      width: 180px;
+      flex-shrink: 0;
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      align-self: flex-start;
+      position: sticky;
+      top: 72px;
+    }
+    .filter-panel h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-section { margin-bottom: 20px; }
+    .filter-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .filter-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #333;
+    }
+    .filter-checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #7c18ae;
+    }
+    .filter-range-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .filter-range-row select {
+      padding: 4px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .filter-range-row select:focus { outline: none; border-color: #7c18ae; }
+    .reset-btn {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .reset-btn:hover { background: #e2e8f0; color: #333; }
+
+    /* Content Area */
+    .content-area { flex: 1; min-width: 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #7c18ae;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Chart Containers */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .chart-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .chart-box.full { grid-column: 1 / -1; }
+    .chart-box h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .chart-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .chart-box-header h4 { margin-bottom: 0; }
+    .export-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #94a3b8;
+      transition: color 0.2s, background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .export-icon-btn:hover { color: #7c18ae; background: #f3e8f9; }
+    .export-icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .export-icon-btn .export-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
+    .export-btn-group { display: inline-flex; gap: 2px; }
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .chart-wrapper.h300 { height: 300px; }
+    .chart-wrapper.h400 { height: 400px; }
+    .chart-wrapper.h500 { height: 500px; }
+
+    /* Three-column chart row — matches kpi-grid exactly */
+    .chart-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-row-3 > .chart-box {
+      min-width: 0;  /* prevent grid blowout */
+    }
+
+    /* Heatmap Table */
+    .heatmap-wrapper { overflow-x: auto; }
+    .heatmap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .heatmap-table th {
+      background: #7c18ae;
+      color: #fff;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .heatmap-table th.rotate {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      padding: 10px 6px;
+      max-width: 40px;
+      vertical-align: bottom;
+    }
+    .heatmap-table td {
+      padding: 6px 10px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      font-weight: 600;
+      min-width: 36px;
+    }
+    .heatmap-table td.row-label {
+      text-align: left;
+      background: #f8fafc;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    /* Gaps Table */
+    .gaps-table-wrapper { overflow-x: auto; max-height: 600px; overflow-y: auto; }
+    .gaps-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .gaps-table th {
+      background: #7c18ae;
+      color: #fff;
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .gaps-table th:hover { background: #6a1496; }
+    .gaps-table td {
+      padding: 4px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .gaps-table tr:nth-child(even) { background: #f8fafc; }
+    .count-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .count-badge.zero { background: #fef2f2; color: #dc2626; }
+    .count-badge.low { background: #fffbeb; color: #92400e; }
+    .count-badge.ok { background: #f0fdf4; color: #16a34a; }
+
+    /* Gaps table header filters */
+    .gaps-table .filter-row th {
+      background: #6a1496;
+      padding: 4px 8px;
+      top: 30px;
+    }
+    .gaps-table .filter-row select {
+      width: 100%;
+      padding: 4px 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      cursor: pointer;
+      appearance: auto;
+    }
+    .gaps-table .filter-row select option {
+      background: #fff;
+      color: #333;
+    }
+    .gaps-table .filter-row .count-input {
+      width: 100%;
+      padding: 4px 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      text-align: center;
+    }
+    .gaps-table .filter-row .count-input::placeholder { color: rgba(255,255,255,0.6); }
+
+    /* Loading State */
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+    .loading-spinner::before {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #7c18ae;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 1024px) {
+      .chart-row { grid-template-columns: 1fr; }
+      .chart-row-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 12px 16px;
+        gap: 8px;
+      }
+      .top-bar-title { width: 100%; margin-right: 0; }
+      .tab-nav { width: 100%; }
+      .tab-btn { padding: 6px 14px; font-size: 13px; }
+      .top-bar-actions { position: absolute; top: 16px; right: 16px; }
+
+      .main-layout {
+        flex-direction: column;
+        padding: 12px;
+      }
+      .filter-panel {
+        width: 100%;
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 16px;
+      }
+      .filter-panel h3 { width: 100%; margin-bottom: 8px; }
+      .filter-section { margin-bottom: 0; min-width: 140px; }
+
+      .kpi-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .kpi-value { font-size: 22px; }
+      .tab-btn { padding: 6px 10px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div class="login-overlay" id="loginScreen">
+    <div class="login-box">
+      <h1>Skills Survey Dashboard</h1>
+      <p class="subtitle">Enter the admin password to view the dashboard</p>
+      <div class="form-group">
+        <input type="password" id="passwordInput" placeholder="Enter password" autofocus>
+      </div>
+      <button class="login-btn" id="loginBtn">Sign In</button>
+      <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard-shell" id="dashboardShell">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-title">Skills Survey Dashboard</div>
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="skills">Skills Analysis</button>
+        <button class="tab-btn" data-tab="gaps">Skill Gaps</button>
+      </div>
+      <div class="top-bar-actions">
+        <a href="#" class="top-action-link" id="downloadCsvLink">&#128196; Download CSV</a>
+        <a href="#" class="top-action-link sign-out" id="signOutLink">Sign Out</a>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <h3>Filters</h3>
+        <div class="filter-section">
+          <div class="filter-section-title">Primary Job Family</div>
+          <label class="filter-checkbox"><input type="checkbox" value="HW Engineering" checked> HW Engineering</label>
+          <label class="filter-checkbox"><input type="checkbox" value="IT Infra and App Ops" checked> IT Infra &amp; App Ops</label>
+          <label class="filter-checkbox"><input type="checkbox" value="Software Engineering" checked> Software Engineering</label>
+          <label class="filter-checkbox"><input type="checkbox" value="Systems Engineering" checked> Systems Engineering</label>
+          <label class="filter-checkbox"><input type="checkbox" value="V&V Testing" checked> V&amp;V Testing</label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-title">Skill Type</div>
+          <label class="filter-checkbox"><input type="checkbox" value="competencies" checked> Competency</label>
+          <label class="filter-checkbox"><input type="checkbox" value="sme" checked> SME</label>
+          <label class="filter-checkbox"><input type="checkbox" value="technical" checked> Technical</label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-title">Proficiency Level</div>
+          <div class="filter-range-row">
+            <span>Min</span>
+            <select id="filterLevelMin">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <span>Max</span>
+            <select id="filterLevelMax">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+            </select>
+          </div>
+        </div>
+        <button class="reset-btn" id="resetFiltersBtn">Reset Filters</button>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Tab 1: Overview -->
+        <div class="tab-content active" id="tab-overview">
+          <div class="kpi-grid" id="kpiGrid">
+            <!-- Filled by JS -->
+          </div>
+          <div class="chart-row-3">
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Responses by Job Family</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartJobFamily')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartJobFamily')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h300"><canvas id="chartJobFamily"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Avg Skills / Person by Skill Type</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartSkillsByType')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartSkillsByType')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h300"><canvas id="chartSkillsByType"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Proficiency Distribution</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartProficiency')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartProficiency')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h300"><canvas id="chartProficiency"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Skills Analysis -->
+        <div class="tab-content" id="tab-skills">
+          <div class="chart-row-3">
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Top 10 Competencies</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartTopComp')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartTopComp')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h400"><canvas id="chartTopComp"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Top 10 SME Skills</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartTopSME')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartTopSME')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h400"><canvas id="chartTopSME"></canvas></div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-box-header">
+                <h4>Top 10 Technical Skills</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartTopTech')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartTopTech')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h400"><canvas id="chartTopTech"></canvas></div>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-box full">
+              <div class="chart-box-header">
+                <h4>Skill Cluster Heatmap (Frequency)</h4>
+                <button class="export-icon-btn" title="Export to Excel" onclick="exportHeatmapToExcel()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+              </div>
+              <div class="heatmap-wrapper" id="heatmapContainer"></div>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-box full">
+              <div class="chart-box-header">
+                <h4>Avg Proficiency by Skill Cluster</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to PowerPoint" onclick="exportChartToPPT('chartClusterProf')"><svg viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 3v14h14V5H5zm3 3h2v2H8V8zm0 4h8v1H8v-1zm0 2h6v1H8v-1zm4-6h4v3h-4V8z"/></svg><span class="export-label">PPT</span></button>
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartClusterProf')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper" id="chartClusterProfWrapper" style="height:400px"><canvas id="chartClusterProf"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Gaps -->
+        <div class="tab-content" id="tab-gaps">
+          <div class="chart-row">
+            <div class="chart-box full">
+              <div class="chart-box-header">
+                <h4>Skill Gaps (Unreported or Low-Frequency Skills)</h4>
+                <button class="export-icon-btn" title="Export to Excel" onclick="exportGapsToExcel()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+              </div>
+              <div class="gaps-table-wrapper" id="gapsTableContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js?v=2"></script>
+  <script>
+    // ========== Configuration ==========
+    const SUPABASE_URL = 'https://mytwbqzdoeyvfryailaz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15dHdicXpkb2V5dmZyeWFpbGF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzODkwMTIsImV4cCI6MjA4Njk2NTAxMn0.szWgDoagFyczW60VWoId89hICtNIuybMoViVJ7p06vo';
+    const ADMIN_PASSWORD_HASH = '1f473ab320af25f461f9cf9021990590e0d245a74080cdde6c7b8d2a43a28f65';
+    async function hashPassword(pwd) {
+      const data = new TextEncoder().encode(pwd);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    const SESSION_KEY = 'survey_dashboard_session';
+    const SESSION_DURATION = 60 * 60 * 1000;
+
+    // ========== State ==========
+    let allData = [];          // submitted responses
+    let draftCount = 0;        // count of unsubmitted drafts
+    let chartInstances = {};   // track Chart.js instances for cleanup
+
+    // ========== Auth ==========
+    document.getElementById('passwordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') authenticate();
+    });
+    document.getElementById('loginBtn').addEventListener('click', authenticate);
+    document.getElementById('signOutLink').addEventListener('click', e => { e.preventDefault(); logout(); });
+    document.getElementById('downloadCsvLink').addEventListener('click', e => { e.preventDefault(); downloadCSV(); });
+
+    (function checkSession() {
+      const session = localStorage.getItem(SESSION_KEY);
+      if (session) {
+        const expiry = parseInt(session, 10);
+        if (Date.now() < expiry) {
+          showDashboard();
+          scheduleAutoLogout(expiry - Date.now());
+          return;
+        }
+        localStorage.removeItem(SESSION_KEY);
+      }
+    })();
+
+    async function authenticate() {
+      const inputHash = await hashPassword(document.getElementById('passwordInput').value);
+      if (inputHash === ADMIN_PASSWORD_HASH) {
+        const expiry = Date.now() + SESSION_DURATION;
+        localStorage.setItem(SESSION_KEY, expiry.toString());
+        showDashboard();
+        scheduleAutoLogout(SESSION_DURATION);
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    }
+
+    let logoutTimer = null;
+    function scheduleAutoLogout(ms) {
+      if (logoutTimer) clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => { alert('Session expired.'); logout(); }, ms);
+    }
+
+    function logout() {
+      if (logoutTimer) clearTimeout(logoutTimer);
+      logoutTimer = null;
+      localStorage.removeItem(SESSION_KEY);
+      document.getElementById('dashboardShell').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('loginError').style.display = 'none';
+      allData = [];
+      draftCount = 0;
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboardShell').style.display = 'block';
+      loadAllData();
+    }
+
+    // ========== CSV Export ==========
+    function flattenRow(row) {
+      const flat = {
+        id: row.id,
+        created_at: row.created_at,
+        employee_id: row.employee_id,
+        job_family: row.job_family
+      };
+      const types = [
+        { key: 'competencies', prefix: 'Comp' },
+        { key: 'sme', prefix: 'SME' },
+        { key: 'technical', prefix: 'Tech' }
+      ];
+      types.forEach(({ key, prefix }) => {
+        const skills = row[key] || [];
+        for (let i = 0; i < 5; i++) {
+          if (i < skills.length) {
+            flat[`${prefix}${i+1}_JobFamily`] = skills[i].jobFamily || '';
+            flat[`${prefix}${i+1}_SkillCluster`] = skills[i].cluster || '';
+            flat[`${prefix}${i+1}_Skill`] = skills[i].skill || '';
+            flat[`${prefix}${i+1}_Level`] = skills[i].level || '';
+          } else {
+            flat[`${prefix}${i+1}_JobFamily`] = '';
+            flat[`${prefix}${i+1}_SkillCluster`] = '';
+            flat[`${prefix}${i+1}_Skill`] = '';
+            flat[`${prefix}${i+1}_Level`] = '';
+          }
+        }
+      });
+      return flat;
+    }
+
+    function downloadCSV() {
+      if (allData.length === 0) {
+        alert('No data to download.');
+        return;
+      }
+      const flatRows = allData.map(flattenRow);
+      const headers = Object.keys(flatRows[0]);
+      let csv = headers.map(h => `"${h}"`).join(',') + '\n';
+      flatRows.forEach(row => {
+        csv += headers.map(h => {
+          const val = (row[h] ?? '').toString().replace(/"/g, '""');
+          return `"${val}"`;
+        }).join(',') + '\n';
+      });
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `survey_responses_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ========== PPT Export ==========
+    function exportChartToPPT(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) { alert('Chart not found.'); return; }
+
+      const chartBox = canvas.closest('.chart-box');
+      const titleEl = chartBox ? chartBox.querySelector('h4') : null;
+      const title = titleEl ? titleEl.textContent : 'Chart';
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const pptx = new PptxGenJS();
+      pptx.defineLayout({ name: 'LAYOUT_WIDE', cx: 13.33, cy: 7.5 });
+      pptx.layout = 'LAYOUT_WIDE';
+
+      const slide = pptx.addSlide();
+      slide.addText(title, {
+        x: 0.5, y: 0.3, w: 12.33, h: 0.6,
+        fontSize: 22, fontFace: 'Segoe UI', color: '333333', bold: true
+      });
+
+      const aspectRatio = canvas.width / canvas.height;
+      const maxW = 11.5, maxH = 5.8;
+      let imgW = maxW, imgH = imgW / aspectRatio;
+      if (imgH > maxH) { imgH = maxH; imgW = imgH * aspectRatio; }
+      const imgX = (13.33 - imgW) / 2;
+
+      slide.addImage({ data: imgData, x: imgX, y: 1.2, w: imgW, h: imgH });
+      slide.addText('Generated ' + new Date().toLocaleDateString(), {
+        x: 0.5, y: 7.0, w: 5, h: 0.3, fontSize: 9, color: '94a3b8', fontFace: 'Segoe UI'
+      });
+
+      const safeName = title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40);
+      pptx.writeFile({ fileName: safeName + '_' + new Date().toISOString().slice(0,10) + '.pptx' });
+    }
+
+    // ========== Excel Export: Chart Data Table ==========
+    function exportChartDataToExcel(canvasId) {
+      const chart = chartInstances[canvasId];
+      if (!chart) { alert('Chart not found.'); return; }
+
+      const chartBox = chart.canvas.closest('.chart-box');
+      const title = chartBox ? chartBox.querySelector('h4').textContent : 'Chart';
+
+      const labels = chart.data.labels || [];
+      const dataset = chart.data.datasets[0] || {};
+      const datasetLabel = dataset.label || 'Value';
+      // Flatten labels (Chart.js may wrap them into arrays)
+      const flatLabels = labels.map(l => Array.isArray(l) ? l.join(' ') : l);
+
+      const headers = ['Label', datasetLabel];
+      const ws = {};
+      const range = { s: { r: 0, c: 0 }, e: { r: flatLabels.length, c: 1 } };
+
+      headers.forEach((h, c) => {
+        ws[XLSX.utils.encode_cell({ r: 0, c })] = {
+          v: h, t: 's',
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: c === 0 ? 'left' : 'center' } }
+        };
+      });
+
+      flatLabels.forEach((label, r) => {
+        const val = dataset.data[r];
+        ws[XLSX.utils.encode_cell({ r: r + 1, c: 0 })] = {
+          v: label, t: 's',
+          s: { font: { sz: 11 }, alignment: { horizontal: 'left' }, border: { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } } }
+        };
+        ws[XLSX.utils.encode_cell({ r: r + 1, c: 1 })] = {
+          v: val, t: 'n',
+          s: { font: { sz: 11, bold: true }, alignment: { horizontal: 'center' }, fill: { fgColor: { rgb: r % 2 === 1 ? 'F8FAFC' : 'FFFFFF' } }, border: { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } } }
+        };
+        if (r % 2 === 1) {
+          ws[XLSX.utils.encode_cell({ r: r + 1, c: 0 })].s.fill = { fgColor: { rgb: 'F8FAFC' } };
+        }
+      });
+
+      ws['!ref'] = XLSX.utils.encode_range(range);
+      ws['!cols'] = [{ wch: 40 }, { wch: 14 }];
+
+      const wb = XLSX.utils.book_new();
+      const sheetName = title.substring(0, 31).replace(/[[\]*?/\\]/g, '');
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      const safeName = title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40);
+      XLSX.writeFile(wb, safeName + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
+
+    // ========== Excel Export: Heatmap ==========
+    // Helper: wrap long labels into max 2 lines for horizontal bar charts
+    function wrapLabel(label, maxChars) {
+      maxChars = maxChars || 28;
+      if (typeof label !== 'string') return label;
+      if (label.length <= maxChars) return label;
+      // Try to split near the middle at a space
+      const mid = Math.ceil(label.length / 2);
+      let splitIdx = label.lastIndexOf(' ', mid + 5);
+      if (splitIdx <= 4) splitIdx = label.indexOf(' ', mid - 5);
+      if (splitIdx <= 0) {
+        // No good space found — hard cut
+        return [label.substring(0, maxChars), label.substring(maxChars)];
+      }
+      return [label.substring(0, splitIdx), label.substring(splitIdx + 1)];
+    }
+
+    function magentaScale(intensity) {
+      const alpha = 0.1 + intensity * 0.8;
+      const r = Math.round(255 + (124 - 255) * alpha);
+      const g = Math.round(255 + (24 - 255) * alpha);
+      const b = Math.round(255 + (174 - 255) * alpha);
+      return toHex(r) + toHex(g) + toHex(b);
+    }
+    function toHex(c) { const h = Math.max(0, Math.min(255, c)).toString(16); return h.length === 1 ? '0' + h : h; }
+
+    function exportHeatmapToExcel() {
+      const table = document.querySelector('#heatmapContainer table.heatmap-table');
+      if (!table) { alert('Heatmap not available.'); return; }
+
+      const rows = table.querySelectorAll('tr');
+      if (rows.length < 2) { alert('No data to export.'); return; }
+
+      // Parse headers
+      const headerCells = rows[0].querySelectorAll('th');
+      const headers = ['Job Family'];
+      headerCells.forEach((th, i) => { if (i > 0) headers.push(th.textContent.trim()); });
+
+      // Parse data
+      const data = [];
+      const values = [];
+      for (let r = 1; r < rows.length; r++) {
+        const cells = rows[r].querySelectorAll('td');
+        const rowArr = [];
+        cells.forEach((td, c) => {
+          if (c === 0) {
+            rowArr.push(td.textContent.trim());
+          } else {
+            const val = td.textContent.trim();
+            const num = val === '' ? 0 : parseInt(val);
+            rowArr.push(num);
+            values.push(num);
+          }
+        });
+        data.push(rowArr);
+      }
+
+      const maxVal = Math.max(...values, 1);
+      const ws = {};
+      const range = { s: { r: 0, c: 0 }, e: { r: data.length, c: headers.length - 1 } };
+
+      // Header row
+      headers.forEach((h, c) => {
+        ws[XLSX.utils.encode_cell({ r: 0, c })] = {
+          v: h, t: 's',
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: 'center', vertical: 'center' } }
+        };
+      });
+
+      // Data rows
+      data.forEach((row, r) => {
+        row.forEach((val, c) => {
+          const ref = XLSX.utils.encode_cell({ r: r + 1, c });
+          if (c === 0) {
+            ws[ref] = { v: val, t: 's', s: { font: { bold: true, sz: 11 }, fill: { fgColor: { rgb: 'F8FAFC' } }, alignment: { horizontal: 'left' } } };
+          } else {
+            const intensity = val / maxVal;
+            const bgColor = val === 0 ? 'FFFFFF' : magentaScale(intensity);
+            const fontColor = intensity > 0.5 ? 'FFFFFF' : '333333';
+            ws[ref] = {
+              v: val === 0 ? '' : val, t: val === 0 ? 's' : 'n',
+              s: {
+                font: { bold: true, color: { rgb: fontColor }, sz: 11 },
+                fill: { fgColor: { rgb: bgColor } },
+                alignment: { horizontal: 'center' },
+                border: { top: { style: 'thin', color: { rgb: 'E2E8F0' } }, bottom: { style: 'thin', color: { rgb: 'E2E8F0' } }, left: { style: 'thin', color: { rgb: 'E2E8F0' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } }
+              }
+            };
+          }
+        });
+      });
+
+      ws['!ref'] = XLSX.utils.encode_range(range);
+      ws['!cols'] = headers.map((h, i) => ({ wch: i === 0 ? 28 : 8 }));
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Heatmap');
+      XLSX.writeFile(wb, 'Skill_Heatmap_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
+
+    // ========== Excel Export: Gaps Table ==========
+    function exportGapsToExcel() {
+      const rows = getFilteredGapsRows();
+      if (rows.length === 0) { alert('No data to export.'); return; }
+
+      const headers = ['Skill Type', 'Job Family', 'Skill Cluster', 'Skill', 'Count'];
+      const ws = {};
+      const range = { s: { r: 0, c: 0 }, e: { r: rows.length, c: headers.length - 1 } };
+
+      // Header row
+      headers.forEach((h, c) => {
+        ws[XLSX.utils.encode_cell({ r: 0, c })] = {
+          v: h, t: 's',
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 12 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: 'left' } }
+        };
+      });
+
+      // Data rows
+      rows.forEach((row, r) => {
+        const vals = [row.skillType, row.jf, row.cluster, row.skill, row.count];
+        vals.forEach((val, c) => {
+          const ref = XLSX.utils.encode_cell({ r: r + 1, c });
+          if (c < 4) {
+            const s = { font: { sz: 11 }, alignment: { horizontal: 'left', vertical: 'top' }, border: { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } } };
+            if (r % 2 === 1) s.fill = { fgColor: { rgb: 'F8FAFC' } };
+            ws[ref] = { v: val, t: 's', s };
+          } else {
+            let bgColor, fontColor;
+            if (val === 0) { bgColor = 'FEF2F2'; fontColor = 'DC2626'; }
+            else if (val <= 2) { bgColor = 'FFFBEB'; fontColor = '92400E'; }
+            else { bgColor = 'F0FDF4'; fontColor = '16A34A'; }
+            ws[ref] = {
+              v: val, t: 'n',
+              s: { font: { bold: true, color: { rgb: fontColor }, sz: 11 }, fill: { fgColor: { rgb: bgColor } }, alignment: { horizontal: 'center' }, border: { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } } }
+            };
+          }
+        });
+      });
+
+      ws['!ref'] = XLSX.utils.encode_range(range);
+      ws['!cols'] = [{ wch: 14 }, { wch: 24 }, { wch: 30 }, { wch: 40 }, { wch: 10 }];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Skill Gaps');
+      XLSX.writeFile(wb, 'Skill_Gaps_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
+
+    // ========== Tab Switching ==========
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+        renderAll();
+      });
+    });
+
+    // ========== Filters ==========
+    function getFilters() {
+      const jfChecks = document.querySelectorAll('.filter-section:nth-child(2) input[type="checkbox"]');
+      const stChecks = document.querySelectorAll('.filter-section:nth-child(3) input[type="checkbox"]');
+      const jobFamilies = [];
+      jfChecks.forEach(c => { if (c.checked) jobFamilies.push(c.value); });
+      const skillTypes = [];
+      stChecks.forEach(c => { if (c.checked) skillTypes.push(c.value); });
+      const levelMin = parseInt(document.getElementById('filterLevelMin').value);
+      const levelMax = parseInt(document.getElementById('filterLevelMax').value);
+      return { jobFamilies, skillTypes, levelMin, levelMax };
+    }
+
+    function applyFilters() {
+      return allData.filter(r => {
+        const filters = getFilters();
+        return filters.jobFamilies.includes(r.job_family);
+      });
+    }
+
+    function extractLevel(levelStr) {
+      if (!levelStr) return 0;
+      const m = levelStr.match(/Level\s+(\d)/);
+      return m ? parseInt(m[1]) : 0;
+    }
+
+    function getAllSkills(data) {
+      const filters = getFilters();
+      const skills = [];
+      data.forEach(r => {
+        filters.skillTypes.forEach(type => {
+          const arr = r[type] || [];
+          arr.forEach(s => {
+            const lvl = extractLevel(s.level);
+            if (lvl >= filters.levelMin && lvl <= filters.levelMax) {
+              skills.push({ ...s, _type: type, _employeeId: r.employee_id, _level: lvl });
+            }
+          });
+        });
+      });
+      return skills;
+    }
+
+    // Wire up filter events
+    document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(c => {
+      c.addEventListener('change', () => renderAll());
+    });
+    document.getElementById('filterLevelMin').addEventListener('change', () => renderAll());
+    document.getElementById('filterLevelMax').addEventListener('change', () => renderAll());
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+      document.querySelectorAll('.filter-panel input[type="checkbox"]').forEach(c => c.checked = true);
+      document.getElementById('filterLevelMin').value = '1';
+      document.getElementById('filterLevelMax').value = '5';
+      renderAll();
+    });
+
+    // ========== Data Loading ==========
+    async function loadAllData() {
+      try {
+        const [submittedRes, draftRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/survey_responses?is_submitted=eq.true&select=*`, {
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+          }),
+          fetch(`${SUPABASE_URL}/rest/v1/survey_responses?is_submitted=eq.false&select=employee_id`, {
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+          })
+        ]);
+
+        if (!submittedRes.ok) throw new Error(`HTTP ${submittedRes.status}`);
+        allData = await submittedRes.json();
+
+        if (draftRes.ok) {
+          const drafts = await draftRes.json();
+          draftCount = drafts.length;
+        }
+
+        renderAll();
+      } catch (error) {
+        console.error('Data load error:', error);
+      }
+    }
+
+    // ========== Rendering ==========
+    function renderAll() {
+      const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+      const filtered = applyFilters();
+      const skills = getAllSkills(filtered);
+
+      if (activeTab === 'overview') renderOverview(filtered, skills);
+      else if (activeTab === 'skills') renderSkillsAnalysis(filtered, skills);
+      else if (activeTab === 'gaps') renderGaps(filtered, skills);
+    }
+
+    // ========== Destroy chart helper ==========
+    function getOrCreateChart(id, config) {
+      if (chartInstances[id]) {
+        chartInstances[id].destroy();
+      }
+      const ctx = document.getElementById(id)?.getContext('2d');
+      if (!ctx) return null;
+      const chart = new Chart(ctx, config);
+      chartInstances[id] = chart;
+      return chart;
+    }
+
+    // ========== Color Palette ==========
+    const COLORS = ['#7c18ae', '#a855f7', '#c084fc', '#9333ea', '#6b21a8', '#d946ef', '#7e22ce', '#a21caf', '#86198f', '#581c87'];
+
+    // ========== Tab 1: Overview ==========
+    function renderOverview(filtered, skills) {
+      const total = filtered.length;
+      const avgSkills = total > 0
+        ? (filtered.reduce((sum, r) => sum + (r.competencies?.length || 0) + (r.sme?.length || 0) + (r.technical?.length || 0), 0) / total).toFixed(1)
+        : 0;
+      const avgProf = skills.length > 0
+        ? (skills.reduce((sum, s) => sum + s._level, 0) / skills.length).toFixed(1)
+        : 0;
+
+      document.getElementById('kpiGrid').innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label">Total Responses</div>
+          <div class="kpi-value">${total}</div>
+          <div class="kpi-sub">${draftCount} draft${draftCount !== 1 ? 's' : ''} in progress</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Skills / Person</div>
+          <div class="kpi-value">${avgSkills}</div>
+          <div class="kpi-sub">out of 15 possible</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Proficiency</div>
+          <div class="kpi-value">${avgProf}</div>
+          <div class="kpi-sub">scale 1 &ndash; 5 (5=Expert)</div>
+        </div>
+      `;
+
+      // Responses by Job Family chart
+      const jfCounts = {};
+      filtered.forEach(r => { jfCounts[r.job_family] = (jfCounts[r.job_family] || 0) + 1; });
+      const jfLabels = Object.keys(jfCounts).sort();
+      const jfValues = jfLabels.map(k => jfCounts[k]);
+      getOrCreateChart('chartJobFamily', {
+        type: 'bar',
+        data: {
+          labels: jfLabels,
+          datasets: [{
+            label: 'Responses',
+            data: jfValues,
+            backgroundColor: COLORS.slice(0, jfLabels.length),
+            borderRadius: 4,
+            maxBarThickness: 32,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 90, minRotation: 90 } }
+          }
+        }
+      });
+
+      // Avg Skills / Person by Skill Type chart
+      const typeLabels = ['Competency', 'SME', 'Technical'];
+      const typeKeys = ['competencies', 'sme', 'technical'];
+      const typeAvgs = typeKeys.map(key => {
+        if (total === 0) return 0;
+        return parseFloat((filtered.reduce((sum, r) => sum + (r[key]?.length || 0), 0) / total).toFixed(1));
+      });
+      getOrCreateChart('chartSkillsByType', {
+        type: 'bar',
+        data: {
+          labels: typeLabels,
+          datasets: [{
+            label: 'Avg Skills',
+            data: typeAvgs,
+            backgroundColor: ['#7c18ae', '#a855f7', '#c084fc'],
+            borderRadius: 4,
+            maxBarThickness: 32,
+            barPercentage: 0.5,
+            categoryPercentage: 0.6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // Proficiency Distribution chart (horizontal, Level 5 at top)
+      const profCounts = [0, 0, 0, 0, 0];
+      skills.forEach(s => { if (s._level >= 1 && s._level <= 5) profCounts[s._level - 1]++; });
+      // Reverse so Level 5 is at the top
+      const profLabels = ['Level 5', 'Level 4', 'Level 3', 'Level 2', 'Level 1'];
+      const profData = [profCounts[4], profCounts[3], profCounts[2], profCounts[1], profCounts[0]];
+      const profColors = ['#6b21a8', '#7c18ae', '#a855f7', '#c084fc', '#e9d5ff'];
+      getOrCreateChart('chartProficiency', {
+        type: 'bar',
+        data: {
+          labels: profLabels,
+          datasets: [{
+            label: 'Skills Count',
+            data: profData,
+            backgroundColor: profColors,
+            borderRadius: 4,
+            barThickness: 22,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // ========== Tab 2: Skills Analysis ==========
+    function renderSkillsAnalysis(filtered, skills) {
+      // Top 10 by type
+      const typeMap = { competencies: 'chartTopComp', sme: 'chartTopSME', technical: 'chartTopTech' };
+      const typeColors = { competencies: '#7c18ae', sme: '#a855f7', technical: '#c084fc' };
+      Object.entries(typeMap).forEach(([type, chartId]) => {
+        const freq = {};
+        skills.filter(s => s._type === type).forEach(s => { freq[s.skill] = (freq[s.skill] || 0) + 1; });
+        const top10 = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        getOrCreateChart(chartId, {
+          type: 'bar',
+          data: {
+            labels: top10.map(e => e[0]),
+            datasets: [{
+              label: 'Frequency',
+              data: top10.map(e => e[1]),
+              backgroundColor: typeColors[type],
+              borderRadius: 4,
+              barThickness: 16
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { beginAtZero: true, ticks: { precision: 0 } },
+              y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 }, callback: function(value) { return wrapLabel(this.getLabelForValue(value), 28); } } }
+            }
+          }
+        });
+      });
+
+      // Skill Cluster Heatmap
+      buildHeatmap(skills);
+
+      // Avg Proficiency by Skill Cluster
+      const clusterProf = {};
+      const clusterProfCount = {};
+      skills.forEach(s => {
+        const c = s.cluster;
+        if (!c) return;
+        clusterProf[c] = (clusterProf[c] || 0) + s._level;
+        clusterProfCount[c] = (clusterProfCount[c] || 0) + 1;
+      });
+      const clusterAvg = Object.entries(clusterProf).map(([c, sum]) => ({
+        cluster: c,
+        avg: sum / clusterProfCount[c]
+      })).sort((a, b) => b.avg - a.avg).slice(0, 20);
+
+      // Dynamic height: 28px per cluster, minimum 300px
+      const clusterChartHeight = Math.max(300, clusterAvg.length * 28);
+      const clusterWrapper = document.getElementById('chartClusterProfWrapper');
+      if (clusterWrapper) clusterWrapper.style.height = clusterChartHeight + 'px';
+
+      getOrCreateChart('chartClusterProf', {
+        type: 'bar',
+        data: {
+          labels: clusterAvg.map(e => e.cluster),
+          datasets: [{
+            label: 'Avg Proficiency',
+            data: clusterAvg.map(e => parseFloat(e.avg.toFixed(2))),
+            backgroundColor: '#7c18ae',
+            borderRadius: 4,
+            barThickness: 14,
+            barPercentage: 0.9,
+            categoryPercentage: 0.85
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } },
+            y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 }, callback: function(value) { return wrapLabel(this.getLabelForValue(value), 28); } } }
+          }
+        }
+      });
+    }
+
+    function buildHeatmap(skills) {
+      const container = document.getElementById('heatmapContainer');
+      const clusters = new Set();
+      const jfSet = new Set();
+      const freq = {};
+      skills.forEach(s => {
+        if (!s.cluster || !s.jobFamily) return;
+        clusters.add(s.cluster);
+        jfSet.add(s.jobFamily);
+        const key = `${s.jobFamily}|||${s.cluster}`;
+        freq[key] = (freq[key] || 0) + 1;
+      });
+
+      const clusterList = [...clusters].sort();
+      const jfList = [...jfSet].sort();
+
+      if (clusterList.length === 0) {
+        container.innerHTML = '<div class="empty-state">No data available</div>';
+        return;
+      }
+
+      const maxVal = Math.max(...Object.values(freq), 1);
+
+      let html = '<table class="heatmap-table"><thead><tr><th></th>';
+      clusterList.forEach(c => { html += `<th class="rotate">${c}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      jfList.forEach(jf => {
+        html += `<tr><td class="row-label">${jf}</td>`;
+        clusterList.forEach(c => {
+          const val = freq[`${jf}|||${c}`] || 0;
+          const intensity = val / maxVal;
+          const bg = val === 0 ? '#fff' : `rgba(124, 24, 174, ${0.1 + intensity * 0.8})`;
+          const color = intensity > 0.5 ? '#fff' : '#333';
+          html += `<td style="background:${bg};color:${color}">${val || ''}</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ========== Tab 3: Gaps ==========
+    let gapsAllRows = [];      // full unfiltered rows for the gaps table
+    let gapsTableFilters = { skillType: '', jf: '', cluster: '', maxCount: '' };
+
+    function renderGaps(filtered, skills) {
+      buildGapsData(skills);
+      renderGapsTable();
+    }
+
+    function buildGapsData(skills) {
+      const filters = getFilters();
+      const skillFreq = {};
+      skills.forEach(s => { skillFreq[s.skill] = (skillFreq[s.skill] || 0) + 1; });
+
+      // Map left-panel skill type checkboxes to SKILLS_DATA keys
+      const typeKeyMap = { competencies: 'Competency', sme: 'SME', technical: 'Technical' };
+      const activeSkillTypes = new Set(filters.skillTypes.map(t => typeKeyMap[t]));
+      const activeJobFamilies = new Set(filters.jobFamilies);
+
+      gapsAllRows = [];
+      if (typeof SKILLS_DATA !== 'undefined') {
+        Object.entries(SKILLS_DATA).forEach(([skillType, families]) => {
+          if (!activeSkillTypes.has(skillType)) return;
+          Object.entries(families).forEach(([jf, clusters]) => {
+            if (jf !== 'General' && !activeJobFamilies.has(jf)) return;
+            Object.entries(clusters).forEach(([cluster, skillList]) => {
+              skillList.forEach(skill => {
+                const count = skillFreq[skill] || 0;
+                gapsAllRows.push({ skillType, jf, cluster, skill, count });
+              });
+            });
+          });
+        });
+      }
+
+      // Sort ascending by count
+      gapsAllRows.sort((a, b) => a.count - b.count || a.skill.localeCompare(b.skill));
+    }
+
+    function getFilteredGapsRows() {
+      return gapsAllRows.filter(r => {
+        if (gapsTableFilters.skillType && r.skillType !== gapsTableFilters.skillType) return false;
+        if (gapsTableFilters.jf && r.jf !== gapsTableFilters.jf) return false;
+        if (gapsTableFilters.cluster && r.cluster !== gapsTableFilters.cluster) return false;
+        if (gapsTableFilters.maxCount !== '' && r.count > parseInt(gapsTableFilters.maxCount)) return false;
+        return true;
+      });
+    }
+
+    function renderGapsTable() {
+      const container = document.getElementById('gapsTableContainer');
+      const rows = getFilteredGapsRows();
+
+      // Collect distinct values for filter dropdowns (from full dataset, not filtered)
+      const skillTypes = [...new Set(gapsAllRows.map(r => r.skillType))].sort();
+      const jobFamilies = [...new Set(gapsAllRows.map(r => r.jf))].sort();
+      const clusters = [...new Set(gapsAllRows.map(r => r.cluster))].sort();
+
+      let html = `<table class="gaps-table">
+        <thead>
+          <tr>
+            <th>Skill Type</th><th>Job Family</th><th>Skill Cluster</th><th>Skill</th><th>Count</th>
+          </tr>
+          <tr class="filter-row">
+            <th><select id="gf-skillType" onchange="onGapsFilter()">
+              <option value="">All</option>
+              ${skillTypes.map(v => `<option value="${v}" ${gapsTableFilters.skillType === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select></th>
+            <th><select id="gf-jf" onchange="onGapsFilter()">
+              <option value="">All</option>
+              ${jobFamilies.map(v => `<option value="${v}" ${gapsTableFilters.jf === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select></th>
+            <th><select id="gf-cluster" onchange="onGapsFilter()">
+              <option value="">All</option>
+              ${clusters.map(v => `<option value="${v}" ${gapsTableFilters.cluster === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select></th>
+            <th></th>
+            <th><input type="number" class="count-input" id="gf-maxCount" placeholder="Max" min="0"
+              value="${gapsTableFilters.maxCount}" onchange="onGapsFilter()" oninput="onGapsFilter()"></th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      if (rows.length === 0) {
+        html += `<tr><td colspan="5" style="text-align:center;padding:40px;color:#94a3b8;">No matching skills</td></tr>`;
+      } else {
+        rows.forEach(r => {
+          const badgeClass = r.count === 0 ? 'zero' : r.count <= 2 ? 'low' : 'ok';
+          html += `<tr>
+            <td>${r.skillType}</td>
+            <td>${r.jf}</td>
+            <td>${r.cluster}</td>
+            <td>${r.skill}</td>
+            <td><span class="count-badge ${badgeClass}">${r.count}</span></td>
+          </tr>`;
+        });
+      }
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function onGapsFilter() {
+      gapsTableFilters.skillType = document.getElementById('gf-skillType').value;
+      gapsTableFilters.jf = document.getElementById('gf-jf').value;
+      gapsTableFilters.cluster = document.getElementById('gf-cluster').value;
+      gapsTableFilters.maxCount = document.getElementById('gf-maxCount').value;
+      renderGapsTable();
+    }
+  </script>
+</body>
+</html>
