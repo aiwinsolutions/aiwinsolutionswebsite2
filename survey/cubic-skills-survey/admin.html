@@ -752,11 +752,13 @@
             flat[`${prefix}${i+1}_JobFamily`] = skills[i].jobFamily || '';
             flat[`${prefix}${i+1}_SkillCluster`] = skills[i].cluster || '';
             flat[`${prefix}${i+1}_Skill`] = skills[i].skill || '';
+            flat[`${prefix}${i+1}_OtherSkill`] = skills[i].otherSkill || '';
             flat[`${prefix}${i+1}_Level`] = skills[i].level || '';
           } else {
             flat[`${prefix}${i+1}_JobFamily`] = '';
             flat[`${prefix}${i+1}_SkillCluster`] = '';
             flat[`${prefix}${i+1}_Skill`] = '';
+            flat[`${prefix}${i+1}_OtherSkill`] = '';
             flat[`${prefix}${i+1}_Level`] = '';
           }
         }
