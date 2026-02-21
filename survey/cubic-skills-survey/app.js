@@ -5,7 +5,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // ========== State ==========
 let currentPage = 1;
-const TOTAL_PAGES = 6;
+const TOTAL_PAGES = 4;
 let isRestoringData = false; // flag to prevent auto-save during restore
 let existingRowFound = false; // track whether a row already exists for this employee
 
@@ -223,6 +223,21 @@ function buildSkillRows(gridId, skillType) {
 
     grid.appendChild(row);
 
+    // Add "Other" text input inside the Skill dropdown group (below the <select>)
+    const skillGroup = document.getElementById(`group-${skillType}-${i}-skill`);
+    if (skillGroup) {
+      const otherInput = document.createElement('input');
+      otherInput.type = 'text';
+      otherInput.id = `${skillType}-${i}-other`;
+      otherInput.placeholder = 'Type your skill (max 140 chars)';
+      otherInput.maxLength = 140;
+      otherInput.disabled = true;
+      otherInput.className = 'other-skill-input';
+      otherInput.style.display = 'none';
+      otherInput.autocomplete = 'off';
+      skillGroup.appendChild(otherInput);
+    }
+
     // Pre-select "General" for hardcoded types
     if (isHardcodedJF) {
       const jfSelect = document.getElementById(`${skillType}-${i}-jf`);
@@ -284,6 +299,9 @@ function setupCascade(skillType, index) {
     resetDropdown(levelSelect);
     hideGroup(`${skillType}-${index}-skill`);
     hideGroup(`${skillType}-${index}-level`);
+    // Reset "Other" text input
+    const otherInputJF = document.getElementById(`${skillType}-${index}-other`);
+    if (otherInputJF) { otherInputJF.style.display = 'none'; otherInputJF.value = ''; otherInputJF.disabled = true; }
     updateRowStatus(skillType, index);
 
     if (jf && SKILLS_DATA[skillType] && SKILLS_DATA[skillType][jf]) {
@@ -302,10 +320,14 @@ function setupCascade(skillType, index) {
     resetDropdown(skillSelect);
     resetDropdown(levelSelect);
     hideGroup(`${skillType}-${index}-level`);
+    // Reset "Other" text input
+    const otherInputCL = document.getElementById(`${skillType}-${index}-other`);
+    if (otherInputCL) { otherInputCL.style.display = 'none'; otherInputCL.value = ''; otherInputCL.disabled = true; }
     updateRowStatus(skillType, index);
 
     if (cluster && SKILLS_DATA[skillType] && SKILLS_DATA[skillType][jf] && SKILLS_DATA[skillType][jf][cluster]) {
       const skills = SKILLS_DATA[skillType][jf][cluster].slice().sort();
+      skills.push('Other');  // Add "Other" as last option
       populateDropdown(skillSelect, skills, 'Skill');
       showGroup(`${skillType}-${index}-skill`);
     } else {
@@ -313,29 +335,67 @@ function setupCascade(skillType, index) {
     }
   });
 
-  // Skill -> Level
+  // Skill -> Level (with "Other" handling)
+  const otherInput = document.getElementById(`${skillType}-${index}-other`);
+
   skillSelect.addEventListener('change', () => {
     const skill = skillSelect.value;
     resetDropdown(levelSelect);
     updateRowStatus(skillType, index);
 
-    if (skill) {
-      const levels = PROFICIENCY_LEVELS.map(l => `Level ${l.level} - ${l.summary}`);
-      populateDropdown(levelSelect, levels, 'Proficiency Level');
-      showGroup(`${skillType}-${index}-level`);
-    } else {
+    if (skill === 'Other') {
+      // Show "Other" text input below the Skill dropdown, hide Level until text entered
+      if (otherInput) {
+        otherInput.style.display = 'block';
+        otherInput.disabled = false;
+        otherInput.value = '';
+        otherInput.focus();
+      }
       hideGroup(`${skillType}-${index}-level`);
+    } else {
+      // Hide "Other" text input
+      if (otherInput) {
+        otherInput.style.display = 'none';
+        otherInput.disabled = true;
+        otherInput.value = '';
+      }
+      if (skill) {
+        const levels = PROFICIENCY_LEVELS.map(l => `Level ${l.level} - ${l.summary}`);
+        populateDropdown(levelSelect, levels, 'Proficiency Level');
+        showGroup(`${skillType}-${index}-level`);
+      } else {
+        hideGroup(`${skillType}-${index}-level`);
+      }
     }
   });
+
+  // "Other" text input -> show Level when text is entered
+  if (otherInput) {
+    otherInput.addEventListener('input', () => {
+      if (otherInput.value.trim()) {
+        // Only populate Level if it isn't already populated (preserve user's selection)
+        if (levelSelect.options.length <= 1 || levelSelect.disabled) {
+          const levels = PROFICIENCY_LEVELS.map(l => `Level ${l.level} - ${l.summary}`);
+          populateDropdown(levelSelect, levels, 'Proficiency Level');
+        }
+        showGroup(`${skillType}-${index}-level`);
+      } else {
+        resetDropdown(levelSelect);
+        hideGroup(`${skillType}-${index}-level`);
+      }
+      updateRowStatus(skillType, index);
+      validateSkillsPage();
+    });
+  }
 
   // Level change -> update row status
   levelSelect.addEventListener('change', () => {
     updateRowStatus(skillType, index);
   });
 
-  // Validate page on every dropdown change
+  // Validate skills page on every dropdown change (cross-grid validation)
   [jfSelect, clusterSelect, skillSelect, levelSelect].forEach(sel => {
-    sel.addEventListener('change', () => validateSkillPage(skillType));
+    sel.addEventListener('change', () => validateSkillsPage());
   });
 }
 
@@ -383,94 +443,71 @@ function hideGroup(id) {
   }
 }
 
+function isRowComplete(skillType, index) {
+  const jf = document.getElementById(`${skillType}-${index}-jf`)?.value || '';
+  const cluster = document.getElementById(`${skillType}-${index}-cluster`)?.value || '';
+  const skill = document.getElementById(`${skillType}-${index}-skill`)?.value || '';
+  const level = document.getElementById(`${skillType}-${index}-level`)?.value || '';
+
+  if (skill === 'Other') {
+    const otherText = document.getElementById(`${skillType}-${index}-other`)?.value?.trim() || '';
+    return !!(jf && cluster && otherText && level);
+  }
+  return !!(jf && cluster && skill && level);
+}
+
 function updateRowStatus(skillType, index) {
   const row = document.querySelector(`.skill-row[data-index="${index}"][data-skill-type="${skillType}"]`);
+  const complete = isRowComplete(skillType, index);
+
   if (!row) {
     // Find by grid context
     const gridId = skillType === 'Competency' ? 'competency-grid' : skillType === 'SME' ? 'sme-grid' : 'technical-grid';
     const rows = document.querySelectorAll(`#${gridId} .skill-row`);
     if (rows[index]) {
-      const levelSelect = document.getElementById(`${skillType}-${index}-level`);
-      if (levelSelect && levelSelect.value) {
-        rows[index].classList.add('completed-row');
-      } else {
-        rows[index].classList.remove('completed-row');
-      }
+      rows[index].classList.toggle('completed-row', complete);
     }
     return;
   }
-  const levelSelect = document.getElementById(`${skillType}-${index}-level`);
-  if (levelSelect && levelSelect.value) {
-    row.classList.add('completed-row');
-  } else {
-    row.classList.remove('completed-row');
-  }
+  row.classList.toggle('completed-row', complete);
 }
 
-// ========== Skill Page Validation ==========
-// Maps page number to skill type
-const PAGE_SKILL_MAP = {
-  3: 'Competency',
-  4: 'SME',
-  5: 'Technical'
-};
-
-// Only page 3 (Competencies) is mandatory; SME and Technical are optional
-const MANDATORY_SKILL_PAGES = [3];
-
-function isSkillPageComplete(skillType) {
-  let completed = 0;
-  for (let i = 0; i < 5; i++) {
-    const jf = document.getElementById(`${skillType}-${i}-jf`)?.value || '';
-    const cluster = document.getElementById(`${skillType}-${i}-cluster`)?.value || '';
-    const skill = document.getElementById(`${skillType}-${i}-skill`)?.value || '';
-    const level = document.getElementById(`${skillType}-${i}-level`)?.value || '';
-    if (jf && cluster && skill && level) {
-      completed++;
-    }
-  }
-  return completed >= 3;
-}
-
+// ========== Skills Page Validation (Cross-Grid) ==========
 function getCompletedRowCount(skillType) {
   let completed = 0;
   for (let i = 0; i < 5; i++) {
-    const jf = document.getElementById(`${skillType}-${i}-jf`)?.value || '';
-    const cluster = document.getElementById(`${skillType}-${i}-cluster`)?.value || '';
-    const skill = document.getElementById(`${skillType}-${i}-skill`)?.value || '';
-    const level = document.getElementById(`${skillType}-${i}-level`)?.value || '';
-    if (jf && cluster && skill && level) {
-      completed++;
-    }
+    if (isRowComplete(skillType, i)) completed++;
   }
   return completed;
 }
 
-function validateSkillPage(skillType) {
-  // Find the page number for this skill type
-  const pageNum = Object.keys(PAGE_SKILL_MAP).find(k => PAGE_SKILL_MAP[k] === skillType);
-  if (!pageNum) return;
+function getTotalCompletedRows() {
+  return getCompletedRowCount('Competency')
+       + getCompletedRowCount('SME')
+       + getCompletedRowCount('Technical');
+}
 
-  const isMandatory = MANDATORY_SKILL_PAGES.includes(parseInt(pageNum));
-  const btn = document.getElementById(`btn-next-${pageNum}`);
-  const complete = isSkillPageComplete(skillType);
+function validateSkillsPage() {
+  const btn = document.getElementById('btn-next-3');
+  if (!btn) return;
 
-  // Optional pages always allow navigation; mandatory pages require completion
-  btn.disabled = isMandatory ? !complete : false;
+  const total = getTotalCompletedRows();
+  const isComplete = total >= 3;
 
-  // Update validation message (only for mandatory pages)
-  const msgId = `validation-msg-${pageNum}`;
+  btn.disabled = !isComplete;
+
+  // Update validation message
+  const msgId = 'validation-msg-3';
   let msg = document.getElementById(msgId);
-  if (isMandatory && !complete) {
-    const completed = getCompletedRowCount(skillType);
-    const moreNeeded = 3 - completed;
+  if (!isComplete) {
+    const moreNeeded = 3 - total;
     if (!msg) {
       msg = document.createElement('div');
       msg.id = msgId;
       msg.className = 'validation-message';
       btn.parentElement.insertBefore(msg, btn);
     }
-    msg.textContent = `Please complete at least 3 rows (${moreNeeded} more needed)`;
+    msg.textContent = `Please complete at least 3 skill rows across all sections (${moreNeeded} more needed)`;
     msg.style.display = 'block';
   } else if (msg) {
     msg.style.display = 'none';
@@ -479,64 +516,70 @@ function validateSkillPage(skillType) {
 
 // ========== Navigation ==========
 function setupNavigation() {
-  // Next buttons
-  for (let i = 1; i < TOTAL_PAGES; i++) {
-    const btn = document.getElementById(`btn-next-${i}`);
-    if (btn) {
-      // Disable Next on mandatory skill pages by default
-      if (MANDATORY_SKILL_PAGES.includes(i)) {
-        btn.disabled = true;
+  // Page 1 Next button
+  const btn1 = document.getElementById('btn-next-1');
+  if (btn1) {
+    btn1.addEventListener('click', async () => {
+      surveyState.employeeId = document.getElementById('employeeIdInput').value.trim();
+      surveyState.jobFamily = document.getElementById('jobFamilyInput').value;
+
+      // Check for existing draft and offer to resume
+      if (window._existingDraft) {
+        const existing = window._existingDraft;
+        const hasData = (existing.competencies && existing.competencies.length > 0) ||
+                        (existing.sme && existing.sme.length > 0) ||
+                        (existing.technical && existing.technical.length > 0);
+        if (hasData) {
+          const resume = confirm('We found your previous progress. Would you like to continue where you left off?');
+          if (resume) {
+            await restoreState(existing);
+            return;
+          }
+        }
       }
-      btn.addEventListener('click', async () => {
-        if (i === 1) {
-          surveyState.employeeId = document.getElementById('employeeIdInput').value.trim();
-          surveyState.jobFamily = document.getElementById('jobFamilyInput').value;
+      goToPage(2);
+    });
+  }
 
-          // Check for existing draft and offer to resume
-          if (window._existingDraft) {
-            const existing = window._existingDraft;
-            const hasData = (existing.competencies && existing.competencies.length > 0) ||
-                            (existing.sme && existing.sme.length > 0) ||
-                            (existing.technical && existing.technical.length > 0);
-            if (hasData) {
-              const resume = confirm('We found your previous progress. Would you like to continue where you left off?');
-              if (resume) {
-                await restoreState(existing);
-                return;
-              }
-            }
-          }
-        }
-        // Validate mandatory skill pages before allowing navigation
-        if (MANDATORY_SKILL_PAGES.includes(i)) {
-          const skillType = PAGE_SKILL_MAP[i];
-          if (!isSkillPageComplete(skillType)) {
-            validateSkillPage(skillType); // show message
-            return; // block navigation
-          }
-        }
-        goToPage(i + 1);
+  // Page 2 Next button (Instructions → Skills, no validation needed)
+  const btn2 = document.getElementById('btn-next-2');
+  if (btn2) {
+    btn2.addEventListener('click', () => {
+      goToPage(3);
+    });
+  }
 
-        // Auto-save progress after navigating away from skill pages
-        if (i >= 2 && i <= 5) {
-          autoSave();
-        }
-      });
-    }
+  // Page 3 Next button (Skills → Submit, requires cross-grid validation)
+  const btn3 = document.getElementById('btn-next-3');
+  if (btn3) {
+    btn3.disabled = true; // start disabled
+    btn3.addEventListener('click', () => {
+      if (getTotalCompletedRows() < 3) {
+        validateSkillsPage(); // show message
+        return; // block navigation
+      }
+      goToPage(4);
+      autoSave();
+    });
   }
 
   // Back buttons
-  for (let i = 2; i <= TOTAL_PAGES; i++) {
-    const btn = document.getElementById(`btn-back-${i}`);
-    if (btn) {
-      btn.addEventListener('click', () => {
-        goToPage(i - 1);
-        // Auto-save when going back from skill pages
-        if (i >= 3 && i <= 6) {
-          autoSave();
-        }
-      });
-    }
+  const btnBack2 = document.getElementById('btn-back-2');
+  if (btnBack2) {
+    btnBack2.addEventListener('click', () => goToPage(1));
+  }
+
+  const btnBack3 = document.getElementById('btn-back-3');
+  if (btnBack3) {
+    btnBack3.addEventListener('click', () => {
+      goToPage(2);
+      autoSave();
+    });
+  }
+
+  const btnBack4 = document.getElementById('btn-back-4');
+  if (btnBack4) {
+    btnBack4.addEventListener('click', () => goToPage(3));
   }
 
   // Submit button
@@ -547,8 +590,8 @@ function setupNavigation() {
 }
 
 function goToPage(pageNum) {
-  // If going to page 6, build summary
-  if (pageNum === 6) {
+  // If going to page 4 (Submit), build summary
+  if (pageNum === 4) {
     collectAllSkills();
     buildSummary();
   }
@@ -597,7 +640,13 @@ function collectSkillsFromGrid(skillType) {
     const skill = document.getElementById(`${skillType}-${i}-skill`)?.value || '';
     const level = document.getElementById(`${skillType}-${i}-level`)?.value || '';
 
-    if (jf && cluster && skill && level) {
+    // Handle "Other" skill with custom text
+    if (skill === 'Other') {
+      const otherText = document.getElementById(`${skillType}-${i}-other`)?.value?.trim() || '';
+      if (jf && cluster && otherText && level) {
+        skills.push({ jobFamily: jf, cluster, skill, level, otherSkill: otherText });
+      }
+    } else if (jf && cluster && skill && level) {
       skills.push({ jobFamily: jf, cluster, skill, level });
     }
   }
@@ -645,7 +694,10 @@ function buildSummary() {
         item.appendChild(num);
 
         const text = document.createElement('span');
-        text.textContent = `${entry.jobFamily} \u2192 ${entry.cluster} \u2192 ${entry.skill} \u2192 ${entry.level}`;
+        const displaySkill = entry.skill === 'Other' && entry.otherSkill
+          ? `Other: "${entry.otherSkill}"`
+          : entry.skill;
+        text.textContent = `${entry.jobFamily} \u2192 ${entry.cluster} \u2192 ${displaySkill} \u2192 ${entry.level}`;
         item.appendChild(text);
 
         group.appendChild(item);
@@ -713,6 +765,13 @@ async function autoSave() {
 }
 
 // ========== Restore State from Saved Data ==========
+// Map old 6-page numbers to new 4-page numbers (for existing drafts)
+function mapOldPageToNew(oldPage) {
+  if (oldPage <= 2) return oldPage;     // 1→1, 2→2
+  if (oldPage <= 5) return 3;           // 3,4,5→3 (all skill pages → single skills page)
+  return 4;                              // 6→4 (submit)
+}
+
 async function restoreState(data) {
   isRestoringData = true;
 
@@ -743,12 +802,16 @@ async function restoreState(data) {
 
   isRestoringData = false;
 
-  // Navigate to saved page (or page 2 minimum, since they just passed page 1)
-  const targetPage = data.current_page && data.current_page > 1 ? data.current_page : 2;
+  // Navigate to saved page (mapped from old page numbers, minimum page 2)
+  let targetPage = data.current_page && data.current_page > 1 ? data.current_page : 2;
+  // Map old page numbers (if draft was saved with 6-page layout)
+  if (targetPage > 4) {
+    targetPage = mapOldPageToNew(targetPage);
+  }
   goToPage(targetPage);
 
-  // Re-validate skill pages
-  Object.values(PAGE_SKILL_MAP).forEach(st => validateSkillPage(st));
+  // Re-validate skills page
+  validateSkillsPage();
 }
 
 async function restoreSkillRow(skillType, index, skillData) {
@@ -772,10 +835,11 @@ async function restoreSkillRow(skillType, index, skillData) {
   if (skillData.cluster) {
     const clusterSelect = document.getElementById(`${skillType}-${index}-cluster`);
     clusterSelect.value = skillData.cluster;
-    // Trigger cascade: populate skills
+    // Trigger cascade: populate skills (include "Other")
     const jf = isHardcoded ? 'General' : skillData.jobFamily;
     if (SKILLS_DATA[skillType] && SKILLS_DATA[skillType][jf] && SKILLS_DATA[skillType][jf][skillData.cluster]) {
       const skills = SKILLS_DATA[skillType][jf][skillData.cluster].slice().sort();
+      skills.push('Other');
       const skillSelect = document.getElementById(`${skillType}-${index}-skill`);
       populateDropdown(skillSelect, skills, 'Skill');
       showGroup(`${skillType}-${index}-skill`);
@@ -786,6 +850,17 @@ async function restoreSkillRow(skillType, index, skillData) {
   if (skillData.skill) {
     const skillSelect = document.getElementById(`${skillType}-${index}-skill`);
     skillSelect.value = skillData.skill;
+
+    // If "Other", show and populate the text input
+    if (skillData.skill === 'Other' && skillData.otherSkill) {
+      const otherInput = document.getElementById(`${skillType}-${index}-other`);
+      if (otherInput) {
+        otherInput.style.display = 'block';
+        otherInput.disabled = false;
+        otherInput.value = skillData.otherSkill;
+      }
+    }
+
     // Trigger cascade: populate levels
     const levels = PROFICIENCY_LEVELS.map(l => `Level ${l.level} - ${l.summary}`);
     const levelSelect = document.getElementById(`${skillType}-${index}-level`);
@@ -817,7 +892,7 @@ async function handleSubmit() {
     competencies: surveyState.competencies,
     sme: surveyState.sme,
     technical: surveyState.technical,
-    current_page: 6,
+    current_page: 4,
     is_submitted: true
   };
 
@@ -857,7 +932,7 @@ function showSuccess() {
   submitBtn.classList.remove('loading');
 
   // Hide form content, show success
-  document.querySelector('#page6 .closing-content').style.display = 'none';
-  document.querySelector('#page6 .nav-buttons').style.display = 'none';
+  document.querySelector('#page4 .closing-content').style.display = 'none';
+  document.querySelector('#page4 .nav-buttons').style.display = 'none';
   document.getElementById('successMessage').style.display = 'block';
 }

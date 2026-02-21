@@ -37,7 +37,7 @@ body {
   background: linear-gradient(90deg, #2563eb, #3b82f6);
   border-radius: 3px;
   transition: width 0.4s ease;
-  width: 16.66%;
+  width: 25%;
 }
 
 .progress-labels {
@@ -314,6 +314,26 @@ h3 {
   font-size: 14px;
 }
 
+/* Grid section titles (for merged skills page) */
+.grid-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 28px 0 8px;
+  color: #1e40af;
+  border-bottom: 2px solid #dbeafe;
+  padding-bottom: 6px;
+}
+
+.grid-section-title:first-of-type {
+  margin-top: 16px;
+}
+
+.grid-section-desc {
+  color: #475569;
+  margin: 4px 0 10px;
+  font-size: 14px;
+}
+
 /* Grid column headers */
 .grid-header {
   display: flex;
@@ -453,6 +473,39 @@ h3 {
   pointer-events: auto;
   max-height: 200px;
   transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+/* "Other" skill text input — appears below the Skill select */
+.other-skill-input {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  width: 100%;
+  color: #1e293b;
+  background: #fff !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+
+.other-skill-input:-webkit-autofill,
+.other-skill-input:-webkit-autofill:hover,
+.other-skill-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #1e293b !important;
+}
+
+.other-skill-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.other-skill-input::placeholder {
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 /* ========== Skills Structure Reference (below grids) ========== */
