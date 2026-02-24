@@ -87,8 +87,8 @@
       color: #64748b;
       transition: background 0.2s, color 0.2s;
     }
-    .tab-btn:hover { background: #e6f4f8; color: #006080; }
-    .tab-btn.active { background: #006080; color: #fff; }
+    .tab-btn:hover { background: #f3e8f9; color: #7c18ae; }
+    .tab-btn.active { background: #7c18ae; color: #fff; }
     .top-bar-actions {
       display: flex;
       align-items: center;
@@ -96,14 +96,14 @@
       margin-left: 16px;
     }
     .top-action-link {
-      color: #006080;
+      color: #7c18ae;
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
       white-space: nowrap;
       transition: color 0.2s;
     }
-    .top-action-link:hover { color: #004d66; text-decoration: underline; }
+    .top-action-link:hover { color: #6a1496; text-decoration: underline; }
     .top-action-link.sign-out { color: #64748b; font-weight: 500; }
     .top-action-link.sign-out:hover { color: #dc2626; }
 
@@ -158,7 +158,7 @@
       width: 16px;
       height: 16px;
       cursor: pointer;
-      accent-color: #006080;
+      accent-color: #7c18ae;
     }
     .filter-range-row {
       display: flex;
@@ -174,7 +174,7 @@
       background: #fff;
       cursor: pointer;
     }
-    .filter-range-row select:focus { outline: none; border-color: #006080; }
+    .filter-range-row select:focus { outline: none; border-color: #7c18ae; }
     .reset-btn {
       width: 100%;
       padding: 8px;
@@ -218,7 +218,7 @@
     .kpi-value {
       font-size: 24px;
       font-weight: 700;
-      color: #006080;
+      color: #7c18ae;
     }
     .kpi-sub {
       font-size: 12px;
@@ -265,7 +265,7 @@
       align-items: center;
       gap: 3px;
     }
-    .export-icon-btn:hover { color: #006080; background: #e6f4f8; }
+    .export-icon-btn:hover { color: #7c18ae; background: #f3e8f9; }
     .export-icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
     .export-icon-btn .export-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
     .export-btn-group { display: inline-flex; gap: 2px; }
@@ -296,7 +296,7 @@
       font-size: 12px;
     }
     .heatmap-table th {
-      background: #006080;
+      background: #7c18ae;
       color: #fff;
       padding: 8px 10px;
       text-align: left;
@@ -334,7 +334,7 @@
       font-size: 13px;
     }
     .gaps-table th {
-      background: #006080;
+      background: #7c18ae;
       color: #fff;
       padding: 6px 10px;
       text-align: left;
@@ -344,7 +344,7 @@
       cursor: pointer;
       user-select: none;
     }
-    .gaps-table th:hover { background: #004d66; }
+    .gaps-table th:hover { background: #6a1496; }
     .gaps-table td {
       padding: 4px 10px;
       border-bottom: 1px solid #e2e8f0;
@@ -364,7 +364,7 @@
 
     /* Gaps table header filters */
     .gaps-table .filter-row th {
-      background: #004d66;
+      background: #6a1496;
       padding: 4px 8px;
       top: 30px;
     }
@@ -409,7 +409,7 @@
       width: 24px;
       height: 24px;
       border: 3px solid #e2e8f0;
-      border-top-color: #006080;
+      border-top-color: #7c18ae;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin-right: 12px;
@@ -809,7 +809,7 @@
       headers.forEach((h, c) => {
         ws[XLSX.utils.encode_cell({ r: 0, c })] = {
           v: h, t: 's',
-          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '006080' } }, alignment: { horizontal: c === 0 ? 'left' : 'center' } }
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: c === 0 ? 'left' : 'center' } }
         };
       });
 
@@ -855,11 +855,11 @@
       return [label.substring(0, splitIdx), label.substring(splitIdx + 1)];
     }
 
-    function tealScale(intensity) {
+    function purpleScale(intensity) {
       const alpha = 0.1 + intensity * 0.8;
-      const r = Math.round(255 + (0 - 255) * alpha);
-      const g = Math.round(255 + (96 - 255) * alpha);
-      const b = Math.round(255 + (128 - 255) * alpha);
+      const r = Math.round(255 + (124 - 255) * alpha);
+      const g = Math.round(255 + (24 - 255) * alpha);
+      const b = Math.round(255 + (174 - 255) * alpha);
       return toHex(r) + toHex(g) + toHex(b);
     }
     function toHex(c) { const h = Math.max(0, Math.min(255, c)).toString(16); return h.length === 1 ? '0' + h : h; }
@@ -903,7 +903,7 @@
       headers.forEach((h, c) => {
         ws[XLSX.utils.encode_cell({ r: 0, c })] = {
           v: h, t: 's',
-          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '006080' } }, alignment: { horizontal: 'center', vertical: 'center' } }
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: 'center', vertical: 'center' } }
         };
       });
 
@@ -915,7 +915,7 @@
             ws[ref] = { v: val, t: 's', s: { font: { bold: true, sz: 11 }, fill: { fgColor: { rgb: 'F8FAFC' } }, alignment: { horizontal: 'left' } } };
           } else {
             const intensity = val / maxVal;
-            const bgColor = val === 0 ? 'FFFFFF' : tealScale(intensity);
+            const bgColor = val === 0 ? 'FFFFFF' : purpleScale(intensity);
             const fontColor = intensity > 0.5 ? 'FFFFFF' : '333333';
             ws[ref] = {
               v: val === 0 ? '' : val, t: val === 0 ? 's' : 'n',
@@ -951,7 +951,7 @@
       headers.forEach((h, c) => {
         ws[XLSX.utils.encode_cell({ r: 0, c })] = {
           v: h, t: 's',
-          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 12 }, fill: { fgColor: { rgb: '006080' } }, alignment: { horizontal: 'left' } }
+          s: { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 12 }, fill: { fgColor: { rgb: '7C18AE' } }, alignment: { horizontal: 'left' } }
         };
       });
 
@@ -1102,7 +1102,7 @@
     }
 
     // ========== Color Palette ==========
-    const COLORS = ['#006080', '#0090b8', '#33b5d5', '#007a9e', '#004d66', '#40c4e0', '#005c73', '#008fad', '#00708c', '#003d52'];
+    const COLORS = ['#7c18ae', '#a855f7', '#c084fc', '#9333ea', '#6a1496', '#d8b4fe', '#581c87', '#9333ea', '#7e22ce', '#4c1d95'];
 
     // ========== Tab 1: Overview ==========
     function renderOverview(filtered, skills) {
@@ -1176,7 +1176,7 @@
           datasets: [{
             label: 'Avg Skills',
             data: typeAvgs,
-            backgroundColor: ['#006080', '#0090b8', '#33b5d5'],
+            backgroundColor: ['#7c18ae', '#a855f7', '#c084fc'],
             borderRadius: 4,
             maxBarThickness: 32,
             barPercentage: 0.5,
@@ -1200,7 +1200,7 @@
       // Reverse so Level 5 is at the top
       const profLabels = ['Level 5', 'Level 4', 'Level 3', 'Level 2', 'Level 1'];
       const profData = [profCounts[4], profCounts[3], profCounts[2], profCounts[1], profCounts[0]];
-      const profColors = ['#004d66', '#006080', '#0090b8', '#33b5d5', '#99ddef'];
+      const profColors = ['#4c1d95', '#7c18ae', '#a855f7', '#c084fc', '#e9d5ff'];
       getOrCreateChart('chartProficiency', {
         type: 'bar',
         data: {
@@ -1232,7 +1232,7 @@
     function renderSkillsAnalysis(filtered, skills) {
       // Top 10 by type
       const typeMap = { competencies: 'chartTopComp', sme: 'chartTopSME', technical: 'chartTopTech' };
-      const typeColors = { competencies: '#006080', sme: '#0090b8', technical: '#33b5d5' };
+      const typeColors = { competencies: '#7c18ae', sme: '#a855f7', technical: '#c084fc' };
       Object.entries(typeMap).forEach(([type, chartId]) => {
         const freq = {};
         skills.filter(s => s._type === type).forEach(s => { freq[s.skill] = (freq[s.skill] || 0) + 1; });
@@ -1291,7 +1291,7 @@
           datasets: [{
             label: 'Avg Proficiency',
             data: clusterAvg.map(e => parseFloat(e.avg.toFixed(2))),
-            backgroundColor: '#006080',
+            backgroundColor: '#7c18ae',
             borderRadius: 4,
             barThickness: 14,
             barPercentage: 0.9,
@@ -1344,7 +1344,7 @@
         clusterList.forEach(c => {
           const val = freq[`${jf}|||${c}`] || 0;
           const intensity = val / maxVal;
-          const bg = val === 0 ? '#fff' : `rgba(0, 96, 128, ${0.1 + intensity * 0.8})`;
+          const bg = val === 0 ? '#fff' : `rgba(124, 24, 174, ${0.1 + intensity * 0.8})`;
           const color = intensity > 0.5 ? '#fff' : '#333';
           html += `<td style="background:${bg};color:${color}">${val || ''}</td>`;
         });
