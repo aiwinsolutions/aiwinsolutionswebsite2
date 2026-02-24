@@ -191,16 +191,9 @@ function buildSkillRows(gridId, skillType) {
     row.appendChild(num);
 
     if (isHardcodedJF) {
-      // Hidden Job Family dropdown pre-set to "General"
+      // Job Family dropdown locked to "General" (visible but disabled for alignment)
       const jfGroup = createDropdownGroup('Job Family', `${skillType}-${i}-jf`, ['General'], true);
-      jfGroup.style.display = 'none';
       row.appendChild(jfGroup);
-
-      // Show "General" as static text in the first column
-      const jfLabel = document.createElement('div');
-      jfLabel.className = 'skill-jf-static';
-      jfLabel.textContent = 'General';
-      row.appendChild(jfLabel);
 
       // Skill Cluster dropdown (visible immediately, populated with General's clusters)
       const clusters = SKILLS_DATA[skillType] && SKILLS_DATA[skillType]['General']
@@ -238,10 +231,12 @@ function buildSkillRows(gridId, skillType) {
       skillGroup.appendChild(otherInput);
     }
 
-    // Pre-select "General" for hardcoded types
+    // Pre-select "General" and lock JF dropdown for hardcoded types
     if (isHardcodedJF) {
       const jfSelect = document.getElementById(`${skillType}-${i}-jf`);
       jfSelect.value = 'General';
+      jfSelect.disabled = true;
+      jfSelect.classList.add('locked-jf');
     }
 
     // Setup cascading logic
@@ -665,9 +660,9 @@ function buildSummary() {
   container.innerHTML = '<h3>Your Selections Summary</h3>';
 
   const sections = [
-    { title: 'Competencies Skills', data: surveyState.competencies },
-    { title: 'SME Skills', data: surveyState.sme },
-    { title: 'Technical Skills', data: surveyState.technical }
+    { title: 'Competencies', data: surveyState.competencies },
+    { title: 'Technical Skills', data: surveyState.technical },
+    { title: 'SME Skills', data: surveyState.sme }
   ];
 
   sections.forEach(section => {

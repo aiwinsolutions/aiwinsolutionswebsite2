@@ -114,13 +114,17 @@ const SKILLS_DATA = {
         "Organizational change enablement",
         "Organizational change management"
       ],
-      "Systems Development": [
+      "Software Development": [
         "Animation development",
+        "Card and Transaction encryption and security",
+        "Card/Reader protocols and development",
+        "EMV processing and certification",
         "Functional testing",
         "Hardware design",
         "Infrastructure design",
         "Network design",
         "Non-functional testing",
+        "OS Drivers and Bord Firmware support development",
         "Process testing",
         "Product management",
         "Programming/software development",
@@ -269,17 +273,23 @@ const SKILLS_DATA = {
         "Test Planning"
       ],
       "Automation": [
+        "AI/ML driven testing",
         "Automation Strategy",
         "CI/CD Integration",
         "Framework Design",
         "Scripting",
+        "Test data management at scal",
         "Tool Selection"
       ],
       "Non-Functional": [
+        "Accessibility testing",
         "Compatibility Testing",
+        "Load testing",
         "Performance Testing",
         "Reliability Testing",
         "Security Testing",
+        "Security testing",
+        "Stress testing",
         "Usability Testing"
       ],
       "Agile Testing": [
@@ -289,73 +299,13 @@ const SKILLS_DATA = {
         "Test-Driven Development"
       ],
       "Tools": [
+        "Dashboard tools familiarity",
         "Data Management",
         "Defect Tracking",
         "Environment Setup",
         "Test Management Tools",
+        "Test reporting",
         "Version Control"
-      ]
-    },
-    "IT Infra and App Ops": {
-      "It Service Management": [
-        "Availability Management",
-        "Capacity Management",
-        "Change Management",
-        "Configuration Management (CMDB)",
-        "Incident Management",
-        "Knowledge Management",
-        "Major Incident Management",
-        "Problem Management",
-        "Service Level Management",
-        "Service Request Management"
-      ],
-      "Infrastructure Engineering": [
-        "Cloud Infrastructure (AWS/Azure/GCP)",
-        "Data Center Operations",
-        "Disaster Recovery & Business Continuity",
-        "Hybrid Cloud Architecture",
-        "Infrastructure Monitoring & Alerting",
-        "Infrastructure Security Hardening",
-        "Load Balancing & Traffic Management",
-        "Network Engineering & Administration",
-        "Server & Virtualization Management",
-        "Storage & Backup Management"
-      ],
-      "Application Operations & Support": [
-        "Application Configuration Management",
-        "Batch & Job Scheduling Management",
-        "End-User Support Escalation",
-        "Environment Management (Dev/Test/Prod)",
-        "Log Analysis & Troubleshooting",
-        "Monitoring & Observability",
-        "Patch & Upgrade Management",
-        "Performance Tuning & Optimization",
-        "Production Application Support",
-        "Release & Deployment Management"
-      ],
-      "Devops & Reliability Engineering": [
-        "Automation & Scripting (Python, Bash, PowerShell)",
-        "Blue/Green & Canary Deployments",
-        "CI/CD Pipeline Management",
-        "Chaos Engineering",
-        "Containerization (Docker, Kubernetes)",
-        "Infrastructure as Code (Terraform, CloudFormation)",
-        "Observability Engineering",
-        "Platform Engineering Practices",
-        "Release Automation",
-        "Site Reliability Engineering (SRE) Practices"
-      ],
-      "It Governance & Security Operations": [
-        "Access & Identity Management",
-        "Audit & Regulatory Compliance",
-        "Business Continuity Planning",
-        "Data Protection & Encryption",
-        "IT Controls & Compliance",
-        "Policy & Standards Development",
-        "Risk Assessment & Mitigation",
-        "Security Monitoring & Incident Response",
-        "Third-Party Risk Management",
-        "Vulnerability Management"
       ]
     },
     "HW Engineering": {
@@ -529,35 +479,68 @@ const SKILLS_DATA = {
     "General": {
       "Front-End Engineering": [
         "Angular",
+        "Flutter",
         "HTML5 / CSS3",
         "JavaScript (ES6+)",
+        "Next.js",
         "React",
+        "React Native",
+        "SASS / SCSS",
         "State Management (Redux, NgRx, MobX)",
         "TypeScript",
         "UI Performance Optimization",
         "Vue.js",
-        "Web Accessibility (WCAG / ADA)"
+        "Web Accessibility (WCAG / ADA)",
+        "Webpack / Vite"
       ],
       "Back-End Engineering": [
+        ".NET / ASP.NET",
+        "Apache Kafka",
         "Authentication & Authorization (OAuth2, JWT)",
+        "C",
         "C#",
+        "C++",
+        "COBOL",
         "Go",
         "GraphQL",
+        "Groovy",
+        "Hibernate / JPA",
         "Java",
+        "Kotlin",
         "Node.js",
+        "Objective-C",
+        "PHP",
         "Python",
-        "RESTful API Design"
+        "RESTful API Design",
+        "RabbitMQ",
+        "Ruby",
+        "Rust",
+        "Scala",
+        "Spring / Spring Boot",
+        "Swift",
+        "gRPC"
       ],
       "Data Engineering & Analytics": [
+        "Apache Airflow",
         "Apache Kafka",
         "Apache Spark",
         "Data Warehousing (Snowflake, Redshift, BigQuery)",
+        "Databricks",
         "ETL / ELT Pipelines",
+        "Hadoop",
+        "MATLAB",
+        "MySQL",
         "NoSQL Databases (MongoDB, Cassandra)",
+        "NumPy",
+        "Oracle Database",
+        "Pandas",
+        "PostgreSQL",
         "Power BI",
         "Real-Time Data Processing",
         "SQL",
-        "Tableau"
+        "Snowflake",
+        "Tableau",
+        "dbt"
       ],
       "Machine Learning & AI": [
         "Anomaly Detection",
@@ -602,13 +585,25 @@ const SKILLS_DATA = {
       ],
       "Cloud & Infrastructure": [
         "AWS",
+        "AWS EC2 / S3",
+        "AWS Lambda",
+        "Ansible",
         "Azure",
+        "Azure DevOps",
+        "Azure Functions",
         "CI/CD Pipelines",
+        "Chef",
         "Cloud Networking",
         "Docker",
+        "Google Cloud Compute",
         "Google Cloud Platform",
         "Infrastructure as Code (Terraform, CloudFormation)",
-        "Kubernetes"
+        "Kubernetes",
+        "Linux Administration",
+        "OpenShift",
+        "Puppet",
+        "VMware",
+        "Windows Server Administration"
       ],
       "Electronics Design & PCB Engineering": [
         "Altium",
@@ -705,6 +700,42 @@ const SKILLS_DATA = {
       ],
       "Hardware Design & Architecture": [
         "Pollutanat Materials"
+      ],
+      "DevOps & Platform Engineering": [
+        "Artifactory",
+        "Bitbucket",
+        "ELK Stack (Elasticsearch, Logstash, Kibana)",
+        "Git",
+        "GitHub",
+        "GitLab",
+        "Grafana",
+        "Jenkins",
+        "Nexus Repository",
+        "Prometheus",
+        "SonarQube"
+      ],
+      "Cybersecurity": [
+        "OWASP",
+        "Public Key Infrastructure (PKI)",
+        "SAST / DAST Tools",
+        "SIEM (Splunk)",
+        "Zero Trust Architecture"
+      ],
+      "Embedded Systems Engineering": [
+        "Assembly",
+        "CAN Bus",
+        "Embedded C",
+        "FreeRTOS",
+        "I2C",
+        "SPI",
+        "UART"
+      ],
+      "Enterprise / Business Systems": [
+        "JCL",
+        "Mainframe (z/OS)",
+        "SAP ABAP",
+        "Salesforce",
+        "ServiceNow"
       ]
     }
   }
@@ -713,7 +744,6 @@ const SKILLS_DATA = {
 const JOB_FAMILIES = [
   "General",
   "HW Engineering",
-  "IT Infra and App Ops",
   "Software Engineering",
   "Systems Engineering",
   "V&V Testing"
