@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Skills Survey Dashboard</title>
   <link rel="icon" type="image/x-icon" href="https://aiwinsolutions.com/favicon.ico">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -653,7 +656,7 @@
     </div>
   </div>
 
-  <script src="data.js?v=2"></script>
+  <script src="data.js?v=3"></script>
   <script>
     // ========== Configuration ==========
     const SUPABASE_URL = 'https://mytwbqzdoeyvfryailaz.supabase.co';
@@ -665,7 +668,7 @@
       return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
     const SESSION_KEY = 'survey_dashboard_session';
-    const SESSION_DURATION = 60 * 60 * 1000;
+    const SESSION_DURATION = 48 * 60 * 60 * 1000;
 
     // ========== State ==========
     let allData = [];          // submitted responses
@@ -679,6 +682,12 @@
     document.getElementById('loginBtn').addEventListener('click', authenticate);
     document.getElementById('signOutLink').addEventListener('click', e => { e.preventDefault(); logout(); });
     document.getElementById('downloadCsvLink').addEventListener('click', e => { e.preventDefault(); downloadCSV(); });
+
+    let logoutTimer = null;
+    function scheduleAutoLogout(ms) {
+      if (logoutTimer) clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => { alert('Session expired.'); logout(); }, ms);
+    }
 
     (function checkSession() {
       const session = localStorage.getItem(SESSION_KEY);
@@ -705,12 +714,6 @@
         document.getElementById('passwordInput').value = '';
         document.getElementById('passwordInput').focus();
       }
-    }
-
-    let logoutTimer = null;
-    function scheduleAutoLogout(ms) {
-      if (logoutTimer) clearTimeout(logoutTimer);
-      logoutTimer = setTimeout(() => { alert('Session expired.'); logout(); }, ms);
     }
 
     function logout() {
