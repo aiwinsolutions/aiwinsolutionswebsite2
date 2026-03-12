@@ -292,7 +292,7 @@
     }
 
     /* Heatmap Table */
-    .heatmap-wrapper { overflow-x: auto; }
+    .heatmap-wrapper { overflow-x: auto; overflow-y: auto; max-height: 600px; }
     .heatmap-table {
       width: 100%;
       border-collapse: collapse;
@@ -302,24 +302,25 @@
       background: #006080;
       color: #fff;
       padding: 8px 10px;
-      text-align: left;
+      text-align: center;
       font-weight: 600;
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
-    .heatmap-table th.rotate {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      transform: rotate(180deg);
-      padding: 10px 6px;
-      max-width: 40px;
-      vertical-align: bottom;
+    .heatmap-table th:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      z-index: 3;
     }
     .heatmap-table td {
       padding: 6px 10px;
       text-align: center;
       border: 1px solid #e2e8f0;
       font-weight: 600;
-      min-width: 36px;
+      min-width: 80px;
     }
     .heatmap-table td.row-label {
       text-align: left;
@@ -327,6 +328,9 @@
       font-weight: 600;
       color: #333;
       white-space: nowrap;
+      position: sticky;
+      left: 0;
+      z-index: 1;
     }
 
     /* Gaps Table */
@@ -581,6 +585,17 @@
               <div class="chart-wrapper h300"><canvas id="chartProficiency"></canvas></div>
             </div>
           </div>
+          <div class="chart-row">
+            <div class="chart-box full">
+              <div class="chart-box-header">
+                <h4>Top 10 Overall Skills</h4>
+                <div class="export-btn-group">
+                  <button class="export-icon-btn" title="Export to Excel" onclick="exportChartDataToExcel('chartTopOverall')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
+                </div>
+              </div>
+              <div class="chart-wrapper h400"><canvas id="chartTopOverall"></canvas></div>
+            </div>
+          </div>
         </div>
 
         <!-- Tab 2: Skills Analysis -->
@@ -620,7 +635,7 @@
           <div class="chart-row">
             <div class="chart-box full">
               <div class="chart-box-header">
-                <h4>Skill Cluster Heatmap (Frequency)</h4>
+                <h4>Skill Cluster Heatmap (% of Respondents)</h4>
                 <button class="export-icon-btn" title="Export to Excel" onclick="exportHeatmapToExcel()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h3v2H8v-2zm0 4h3v2H8v-2zm5-4h3v2h-3v-2zm0 4h3v2h-3v-2z"/></svg><span class="export-label">XLS</span></button>
               </div>
               <div class="heatmap-wrapper" id="heatmapContainer"></div>
@@ -876,10 +891,10 @@
 
       // Parse headers
       const headerCells = rows[0].querySelectorAll('th');
-      const headers = ['Job Family'];
-      headerCells.forEach((th, i) => { if (i > 0) headers.push(th.textContent.trim()); });
+      const headers = [];
+      headerCells.forEach(th => { headers.push(th.textContent.trim()); });
 
-      // Parse data
+      // Parse data (values are now percentages like "45%" or empty)
       const data = [];
       const values = [];
       for (let r = 1; r < rows.length; r++) {
@@ -898,7 +913,6 @@
         data.push(rowArr);
       }
 
-      const maxVal = Math.max(...values, 1);
       const ws = {};
       const range = { s: { r: 0, c: 0 }, e: { r: data.length, c: headers.length - 1 } };
 
@@ -917,13 +931,14 @@
           if (c === 0) {
             ws[ref] = { v: val, t: 's', s: { font: { bold: true, sz: 11 }, fill: { fgColor: { rgb: 'F8FAFC' } }, alignment: { horizontal: 'left' } } };
           } else {
-            const intensity = val / maxVal;
+            const intensity = val / 100;
             const bgColor = val === 0 ? 'FFFFFF' : tealScale(intensity);
             const fontColor = intensity > 0.5 ? 'FFFFFF' : '333333';
+            const isTotal = c === row.length - 1;
             ws[ref] = {
-              v: val === 0 ? '' : val, t: val === 0 ? 's' : 'n',
+              v: val === 0 ? '' : val + '%', t: 's',
               s: {
-                font: { bold: true, color: { rgb: fontColor }, sz: 11 },
+                font: { bold: isTotal, color: { rgb: fontColor }, sz: 11 },
                 fill: { fgColor: { rgb: bgColor } },
                 alignment: { horizontal: 'center' },
                 border: { top: { style: 'thin', color: { rgb: 'E2E8F0' } }, bottom: { style: 'thin', color: { rgb: 'E2E8F0' } }, left: { style: 'thin', color: { rgb: 'E2E8F0' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } }
@@ -934,11 +949,11 @@
       });
 
       ws['!ref'] = XLSX.utils.encode_range(range);
-      ws['!cols'] = headers.map((h, i) => ({ wch: i === 0 ? 28 : 8 }));
+      ws['!cols'] = headers.map((h, i) => ({ wch: i === 0 ? 32 : 14 }));
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Heatmap');
-      XLSX.writeFile(wb, 'Skill_Heatmap_' + new Date().toISOString().slice(0,10) + '.xlsx');
+      XLSX.writeFile(wb, 'Skill_Heatmap_Pct_' + new Date().toISOString().slice(0,10) + '.xlsx');
     }
 
     // ========== Excel Export: Gaps Table ==========
@@ -1229,6 +1244,73 @@
           }
         }
       });
+
+      // Top 10 Overall Skills chart (color-coded by skill type)
+      const overallFreq = {};    // skill name → count
+      const overallType = {};    // skill name → { competencies: n, sme: n, technical: n }
+      const typeDisplayNames = { competencies: 'Competency', sme: 'SME', technical: 'Technical' };
+      skills.forEach(s => {
+        let name;
+        if (s.skill === 'Other') {
+          // Combine all "Other" entries per type into one bar
+          const typeSuffix = typeDisplayNames[s._type] || s._type;
+          name = `Other (${typeSuffix})`;
+        } else {
+          name = s.skill;
+        }
+        overallFreq[name] = (overallFreq[name] || 0) + 1;
+        if (!overallType[name]) overallType[name] = { competencies: 0, sme: 0, technical: 0 };
+        overallType[name][s._type]++;
+      });
+      const overallTop10 = Object.entries(overallFreq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const overallTypeColors = { competencies: '#006080', sme: '#0090b8', technical: '#33b5d5' };
+      const overallBarColors = overallTop10.map(([name]) => {
+        const t = overallType[name];
+        // pick the type with the highest count for this skill
+        const dominant = Object.entries(t).sort((a, b) => b[1] - a[1])[0][0];
+        return overallTypeColors[dominant];
+      });
+      getOrCreateChart('chartTopOverall', {
+        type: 'bar',
+        data: {
+          labels: overallTop10.map(e => e[0]),
+          datasets: [{
+            label: 'Frequency',
+            data: overallTop10.map(e => e[1]),
+            backgroundColor: overallBarColors,
+            borderRadius: 4,
+            maxBarThickness: 48,
+            barPercentage: 0.7,
+            categoryPercentage: 0.8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                generateLabels: function() {
+                  return [
+                    { text: 'Competency', fillStyle: '#006080', strokeStyle: '#006080', lineWidth: 0 },
+                    { text: 'SME', fillStyle: '#0090b8', strokeStyle: '#0090b8', lineWidth: 0 },
+                    { text: 'Technical', fillStyle: '#33b5d5', strokeStyle: '#33b5d5', lineWidth: 0 }
+                  ];
+                },
+                boxWidth: 14,
+                padding: 12,
+                font: { size: 11 }
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 10 }, maxRotation: 45, minRotation: 45 } }
+          }
+        }
+      });
     }
 
     // ========== Tab 2: Skills Analysis ==========
@@ -1266,7 +1348,7 @@
       });
 
       // Skill Cluster Heatmap
-      buildHeatmap(skills);
+      buildHeatmap(skills, filtered);
 
       // Avg Proficiency by Skill Cluster
       const clusterProf = {};
@@ -1315,42 +1397,78 @@
 
     }
 
-    function buildHeatmap(skills) {
+    function buildHeatmap(skills, filtered) {
       const container = document.getElementById('heatmapContainer');
       const clusters = new Set();
-      const jfSet = new Set();
-      const freq = {};
-      skills.forEach(s => {
-        if (!s.cluster || !s.jobFamily) return;
-        clusters.add(s.cluster);
-        jfSet.add(s.jobFamily);
-        const key = `${s.jobFamily}|||${s.cluster}`;
-        freq[key] = (freq[key] || 0) + 1;
+
+      // Map employee_id → primary job family
+      const empPrimaryJf = {};
+      filtered.forEach(r => { empPrimaryJf[r.employee_id] = r.job_family; });
+
+      // Count distinct respondents per primary job family
+      const jfRespondents = {};   // primaryJF → Set of employee_ids
+      const allRespondentIds = new Set();
+      filtered.forEach(r => {
+        if (r.job_family) {
+          if (!jfRespondents[r.job_family]) jfRespondents[r.job_family] = new Set();
+          jfRespondents[r.job_family].add(r.employee_id);
+          allRespondentIds.add(r.employee_id);
+        }
       });
 
-      const clusterList = [...clusters].sort();
-      const jfList = [...jfSet].sort();
+      const jfList = Object.keys(jfRespondents).sort();
 
-      if (clusterList.length === 0) {
+      // For each (cluster, primaryJF): set of respondents who selected a skill in that cluster
+      const clusterJfRespondents = {};  // "cluster|||primaryJF" → Set of employee_ids
+      const clusterTotalRespondents = {}; // "cluster" → Set of employee_ids
+      skills.forEach(s => {
+        if (!s.cluster) return;
+        clusters.add(s.cluster);
+        const primaryJf = empPrimaryJf[s._employeeId];
+        if (primaryJf) {
+          const key = `${s.cluster}|||${primaryJf}`;
+          if (!clusterJfRespondents[key]) clusterJfRespondents[key] = new Set();
+          clusterJfRespondents[key].add(s._employeeId);
+        }
+        if (!clusterTotalRespondents[s.cluster]) clusterTotalRespondents[s.cluster] = new Set();
+        clusterTotalRespondents[s.cluster].add(s._employeeId);
+      });
+
+      if (clusters.size === 0) {
         container.innerHTML = '<div class="empty-state">No data available</div>';
         return;
       }
 
-      const maxVal = Math.max(...Object.values(freq), 1);
+      // Compute Total % for each cluster and sort descending
+      const totalCount = allRespondentIds.size || 1;
+      const clusterTotalPct = {};
+      clusters.forEach(c => {
+        clusterTotalPct[c] = ((clusterTotalRespondents[c]?.size || 0) / totalCount) * 100;
+      });
+      const clusterList = [...clusters].sort((a, b) => clusterTotalPct[b] - clusterTotalPct[a]);
 
-      let html = '<table class="heatmap-table"><thead><tr><th></th>';
-      clusterList.forEach(c => { html += `<th class="rotate">${c}</th>`; });
-      html += '</tr></thead><tbody>';
+      // Build table: rows = clusters, columns = job families + Total
+      let html = '<table class="heatmap-table"><thead><tr><th>Skill Cluster</th>';
+      jfList.forEach(jf => { html += `<th>${jf}</th>`; });
+      html += '<th>Total</th></tr></thead><tbody>';
 
-      jfList.forEach(jf => {
-        html += `<tr><td class="row-label">${jf}</td>`;
-        clusterList.forEach(c => {
-          const val = freq[`${jf}|||${c}`] || 0;
-          const intensity = val / maxVal;
-          const bg = val === 0 ? '#fff' : `rgba(0, 96, 128, ${0.1 + intensity * 0.8})`;
+      clusterList.forEach(cluster => {
+        html += `<tr><td class="row-label">${cluster}</td>`;
+        jfList.forEach(jf => {
+          const respondentsInCell = clusterJfRespondents[`${cluster}|||${jf}`]?.size || 0;
+          const respondentsInJf = jfRespondents[jf]?.size || 1;
+          const pct = Math.round((respondentsInCell / respondentsInJf) * 100);
+          const intensity = pct / 100;
+          const bg = pct === 0 ? '#fff' : `rgba(0, 96, 128, ${0.1 + intensity * 0.8})`;
           const color = intensity > 0.5 ? '#fff' : '#333';
-          html += `<td style="background:${bg};color:${color}">${val || ''}</td>`;
+          html += `<td style="background:${bg};color:${color}">${pct > 0 ? pct + '%' : ''}</td>`;
         });
+        // Total column
+        const totalPct = Math.round(clusterTotalPct[cluster]);
+        const totalIntensity = totalPct / 100;
+        const totalBg = totalPct === 0 ? '#fff' : `rgba(0, 96, 128, ${0.1 + totalIntensity * 0.8})`;
+        const totalColor = totalIntensity > 0.5 ? '#fff' : '#333';
+        html += `<td style="background:${totalBg};color:${totalColor};font-weight:700">${totalPct > 0 ? totalPct + '%' : ''}</td>`;
         html += '</tr>';
       });
 
