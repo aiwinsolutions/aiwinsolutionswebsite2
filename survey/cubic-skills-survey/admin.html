@@ -332,6 +332,14 @@
       left: 0;
       z-index: 1;
     }
+    .heatmap-table td.type-label {
+      text-align: left;
+      background: #f8fafc;
+      font-weight: 500;
+      color: #64748b;
+      white-space: nowrap;
+      font-size: 11px;
+    }
 
     /* Gaps Table */
     .gaps-table-wrapper { overflow-x: auto; max-height: 600px; overflow-y: auto; }
@@ -1439,6 +1447,17 @@
         return;
       }
 
+      // Build cluster → skill type lookup from SKILLS_DATA
+      const clusterTypeMap = {};
+      const typeDisplayMap = { Competency: 'Competency', SME: 'SME', Technical: 'Technical' };
+      Object.keys(SKILLS_DATA).forEach(type => {
+        Object.values(SKILLS_DATA[type]).forEach(jfObj => {
+          Object.keys(jfObj).forEach(cluster => {
+            clusterTypeMap[cluster] = typeDisplayMap[type] || type;
+          });
+        });
+      });
+
       // Compute Total % for each cluster and sort descending
       const totalCount = allRespondentIds.size || 1;
       const clusterTotalPct = {};
@@ -1447,13 +1466,14 @@
       });
       const clusterList = [...clusters].sort((a, b) => clusterTotalPct[b] - clusterTotalPct[a]);
 
-      // Build table: rows = clusters, columns = job families + Total
-      let html = '<table class="heatmap-table"><thead><tr><th>Skill Cluster</th>';
+      // Build table: rows = clusters, columns = Skill Type + job families + Total
+      let html = '<table class="heatmap-table"><thead><tr><th>Skill Cluster</th><th>Skill Type</th>';
       jfList.forEach(jf => { html += `<th>${jf}</th>`; });
       html += '<th>Total</th></tr></thead><tbody>';
 
       clusterList.forEach(cluster => {
-        html += `<tr><td class="row-label">${cluster}</td>`;
+        const skillType = clusterTypeMap[cluster] || '';
+        html += `<tr><td class="row-label">${cluster}</td><td class="type-label">${skillType}</td>`;
         jfList.forEach(jf => {
           const respondentsInCell = clusterJfRespondents[`${cluster}|||${jf}`]?.size || 0;
           const respondentsInJf = jfRespondents[jf]?.size || 1;
