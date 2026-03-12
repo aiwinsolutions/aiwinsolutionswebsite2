@@ -53,6 +53,22 @@ function setupPage1Validation() {
     el.addEventListener('input', validate);
     el.addEventListener('change', validate);
   });
+
+  // Show email error on blur if invalid
+  const q2Error = document.getElementById('q2-error');
+  usernameInput.addEventListener('blur', () => {
+    const username = usernameInput.value.trim();
+    if (username.length > 0 && !isValidUsername(username)) {
+      q2Error.style.display = 'block';
+    } else {
+      q2Error.style.display = 'none';
+    }
+  });
+  usernameInput.addEventListener('input', () => {
+    if (q2Error.style.display === 'block' && isValidUsername(usernameInput.value.trim())) {
+      q2Error.style.display = 'none';
+    }
+  });
 }
 
 function isValidUsername(username) {
