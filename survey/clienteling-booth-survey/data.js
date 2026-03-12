@@ -46,7 +46,7 @@ const SEGMENT_QUESTIONS = [
     id: 'q8',
     text: 'Your typical calendar',
     options: [
-      'Back-to-back meetings across multiple time zones',
+      'Back-to-back meetings across multiple time zones with different clients',
       'Block of focus time with internal BCG / Clients to build new things',
       'Deep working sessions with same leadership team'
     ]
