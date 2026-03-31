@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Clienteling Booth Survey</title>
+  <style>
+    :root {
+      --primary:        #147B58;
+      --primary-dark:   #0e5940;
+      --primary-light:  #22c28a;
+      --primary-pale:   #c8eadc;
+      --primary-ultra:  #e4f5ee;
+      --primary-bg:     #f0faf6;
+      --surface:        #ffffff;
+      --text:           #1a2e25;
+      --text-secondary: #3a5f4d;
+      --text-muted:     #6b9482;
+      --border:         #cae5d8;
+      --radius:         12px;
+      --shadow-sm:      0 2px 8px rgba(20,123,88,0.07);
+      --shadow-md:      0 4px 20px rgba(20,123,88,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary-bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    /* ===== Header ===== */
+    .admin-badge {
+      display: inline-block;
+      background: var(--primary-ultra);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .card .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    /* ===== Lock icon ===== */
+    .lock-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    /* ===== Form ===== */
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 15px;
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .error-msg {
+      color: #c0392b;
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* ===== Buttons ===== */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-logout {
+      margin-top: 24px;
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius);
+      padding: 9px 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ===== Admin dashboard ===== */
+    .dashboard { display: none; }
+
+    .stat-box {
+      background: var(--primary-ultra);
+      border: 1.5px solid var(--primary-pale);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-number {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ===== CSV download button ===== */
+    .download-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 28px 20px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .download-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .download-btn:active { transform: translateY(0); }
+
+    .download-btn .dl-icon {
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .download-btn .dl-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .download-btn .dl-sub {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .loading-msg {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LOGIN CARD ===== -->
+  <div class="card" id="loginCard">
+    <span class="lock-icon">&#128274;</span>
+    <div class="admin-badge">Admin Access</div>
+    <h1>Clienteling Booth Survey</h1>
+
+    <div class="form-group">
+      <input type="password" id="pwInput" placeholder="Enter password" autocomplete="current-password">
+      <div class="error-msg" id="pwError">Incorrect password. Please try again.</div>
+    </div>
+
+    <button class="btn-primary" id="loginBtn">Login</button>
+  </div>
+
+  <!-- ===== ADMIN DASHBOARD CARD ===== -->
+  <div class="card dashboard" id="dashboardCard">
+    <div class="admin-badge">Admin Dashboard</div>
+    <h1>Clienteling Booth Survey</h1>
+    <p class="subtitle">CPA Global Summit Expo – Miami 2026</p>
+
+    <div class="stat-box">
+      <div class="stat-number" id="responseCount">—</div>
+      <div class="stat-label">Total Responses</div>
+    </div>
+
+    <button class="download-btn" id="downloadBtn">
+      <span class="dl-icon">&#8681;</span>
+      <span class="dl-label">Download CSV</span>
+    </button>
+
+    <div class="loading-msg" id="loadingMsg">Fetching data, please wait…</div>
+
+    <button class="btn-logout" id="logoutBtn">&#128274; Logout</button>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const ADMIN_PASSWORD = 'miami@2026';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ===== Login =====
+    const pwInput  = document.getElementById('pwInput');
+    const pwError  = document.getElementById('pwError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    function attemptLogin() {
+      if (pwInput.value === ADMIN_PASSWORD) {
+        document.getElementById('loginCard').style.display = 'none';
+        document.getElementById('dashboardCard').style.display = 'block';
+        loadCount();
+      } else {
+        pwError.style.display = 'block';
+        pwInput.select();
+      }
+    }
+
+    loginBtn.addEventListener('click', attemptLogin);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+
+    // ===== Logout =====
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      document.getElementById('dashboardCard').style.display = 'none';
+      document.getElementById('loginCard').style.display = 'block';
+      pwInput.value = '';
+      pwError.style.display = 'none';
+    });
+
+    // ===== Load response count =====
+    async function loadCount() {
+      const { count, error } = await _supabase
+        .from('clienteling_responses')
+        .select('*', { count: 'exact', head: true });
+
+      document.getElementById('responseCount').textContent =
+        error ? '?' : (count ?? 0);
+    }
+
+    // ===== Download CSV =====
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+      const loadingMsg = document.getElementById('loadingMsg');
+      const downloadBtn = document.getElementById('downloadBtn');
+      loadingMsg.style.display = 'block';
+      downloadBtn.disabled = true;
+
+      const { data, error } = await _supabase
+        .from('clienteling_responses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      loadingMsg.style.display = 'none';
+      downloadBtn.disabled = false;
+
+      if (error) {
+        alert('Error fetching data: ' + error.message);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        alert('No responses found yet.');
+        return;
+      }
+
+      // Build CSV
+      const headers = ['id', 'created_at', 'name', 'email', 'cohort', 'clients',
+                       'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'segment'];
+      const escape = val => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+      const csvRows = [
+        headers.join(','),
+        ...data.map(row => headers.map(h => escape(row[h])).join(','))
+      ];
+      const csvString = csvRows.join('\n');
+
+      // Trigger download
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `clienteling_responses_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Refresh count
+      loadCount();
+    });
+  </script>
+</body>
+</html>

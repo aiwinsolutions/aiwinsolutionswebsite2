@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>BCG Clienteling Booth Survey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="survey-container">
+
+    <!-- Progress Bar (3 steps) -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-labels">
+        <span class="progress-step active" data-page="1">Welcome</span>
+        <span class="progress-step" data-page="2">Questions</span>
+        <span class="progress-step" data-page="3">Your Results</span>
+      </div>
+    </div>
+
+    <!-- ===================== PAGE 1: Welcome + Profile ===================== -->
+    <div class="page active" id="page1">
+
+      <!-- Welcome Header -->
+      <div class="expo-header">
+        <div class="expo-badge">CPA GLOBAL SUMMIT EXPO &ndash; MIAMI 2026</div>
+        <h1>CLIENTELING BOOTH SURVEY</h1>
+      </div>
+
+      <div class="survey-purpose">
+        <p>Welcome to the Clienteling booth! To give you a taste of what Clienteling is about, we are running a short survey to understand your &ldquo;Consulting&rdquo; habits and discovery preferences.</p>
+        <p>Based on your responses, we&rsquo;ll reveal your <strong>&lsquo;Consulting&rsquo; personality</strong> and share <strong>customised merchandise</strong> selected just for you!</p>
+      </div>
+
+      <!-- Q1: Name -->
+      <div class="field-group">
+        <label class="field-label" for="q1-input">
+          Name and Last Name <span class="required-star">*</span>
+        </label>
+        <input type="text" id="q1-input" class="form-input" autocomplete="name" maxlength="120">
+      </div>
+
+      <!-- Q2: BCG Email -->
+      <div class="field-group">
+        <label class="field-label" for="q2-username">
+          BCG Email <span class="required-star">*</span>
+        </label>
+        <div class="email-wrapper" id="q2-wrapper">
+          <input type="text" id="q2-username" class="form-input email-input"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="lastname.firstname"
+            maxlength="80">
+          <span class="email-domain">@bcg.com</span>
+        </div>
+        <div class="field-error" id="q2-error" style="display:none;">Please check your email - the format should be lastname.firstname (without @bcg.com).</div>
+      </div>
+
+      <!-- Q3: Cohort -->
+      <div class="field-group">
+        <label class="field-label" for="q3-select">
+          Cohort <span class="required-star">*</span>
+        </label>
+        <div class="select-wrapper">
+          <select id="q3-select" class="form-select">
+            <option value="">-- Select your cohort --</option>
+          </select>
+          <span class="select-arrow">&#8964;</span>
+        </div>
+      </div>
+
+      <!-- Q4: Clients -->
+      <div class="field-group">
+        <label class="field-label" for="q4-input">
+          Client(s) / Brands that Clienteling could be relevant for <span class="required-star">*</span>
+        </label>
+        <textarea id="q4-input" class="form-textarea" rows="3" maxlength="500"></textarea>
+      </div>
+
+      <div class="nav-buttons">
+        <div></div>
+        <button class="btn btn-next" id="btn-next-1" disabled>Next &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===================== PAGE 2: Segment Questions ===================== -->
+    <div class="page" id="page2">
+
+      <!-- Q5–Q10 rendered by JS -->
+      <div id="questions-container"></div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-back" id="btn-back-2">&larr; Back</button>
+        <button class="btn btn-next" id="btn-next-2" disabled>See My Results &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===================== PAGE 3: Results ===================== -->
+    <div class="page" id="page3">
+      <div id="resultsContent"></div>
+    </div>
+
+  </div>
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Your credentials (fill in config.js before uploading) -->
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
