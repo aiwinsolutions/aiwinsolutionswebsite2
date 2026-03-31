@@ -27,6 +27,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Preserve survey folder from gh-pages
+        run: |
+          git fetch origin gh-pages
+          git checkout origin/gh-pages -- survey/ || true
+          if [ -d survey ]; then cp -r survey/ dist/survey/; fi
+
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
