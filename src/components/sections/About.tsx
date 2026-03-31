@@ -18,7 +18,7 @@ const About = () => {
             <CardContent className="p-8">
               <div className="text-center">
                 <p className="text-muted-foreground leading-relaxed max-w-4xl mx-auto text-lg">
-                  Aditya is the Founder of Aiwin Solutions and brings over 25 years of experience in research and analytics. He previously served as the Global Head of Research & Survey Analytics at Boston Consulting Group (BCG) and led BCG's Advanced Capabilities Center in India. Earlier in his career, Aditya established the Market Research function at Evalueserve, scaling it into a 300+ member team and serving leading global research firms and corporates as clients.
+                  Aiwin Solutions was founded by Aditya Jain, who has over 25 years of experience in research and analytics. He served as the Global Head of Research & Survey Analytics at Boston Consulting Group (BCG) and led BCG's Advanced Capabilities Center in India. Earlier in his career, Aditya established the Market Research function at Evalueserve, scaling it into a $9 Mn business, through partnering with global research firms and large corporates.
                 </p>
               </div>
             </CardContent>
